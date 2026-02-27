@@ -48,6 +48,7 @@ export default function SlotPanel({ parts, onPartChange }) {
                     <DropZone label="閉じた目" icon="😌" value={parts.eyeClosed} onChange={(url) => onPartChange('eyeClosed', url)} />
                 </div>
             </div>
+
         </div>
     );
 }
