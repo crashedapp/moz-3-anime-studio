@@ -36,13 +36,15 @@ const serializeExpressions = async (expressions) => {
         }
 
         // Handling eyes
-        ['closed', 'half', 'open'].forEach(eyeState => {
-            if (exp.parts.eyes[eyeState] && exp.parts.eyes[eyeState].startsWith('blob:')) {
-                promises.push(
-                    blobUrlToBase64(exp.parts.eyes[eyeState]).then(b64 => { exp.parts.eyes[eyeState] = b64; })
-                );
-            }
-        });
+        if (exp.parts.eyes) {
+            ['closed', 'half', 'open'].forEach(eyeState => {
+                if (exp.parts.eyes[eyeState] && exp.parts.eyes[eyeState].startsWith('blob:')) {
+                    promises.push(
+                        blobUrlToBase64(exp.parts.eyes[eyeState]).then(b64 => { exp.parts.eyes[eyeState] = b64; })
+                    );
+                }
+            });
+        }
 
         // Handling mouths
         for (let i = 0; i < 5; i++) {
