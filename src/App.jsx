@@ -487,7 +487,7 @@ function App() {
             globalSettings={globalSettings}
             onGlobalSettingsChange={setGlobalSettings}
             expSettings={expressions.find(e => e.id === activeTabId)?.settings || {}}
-            onExpSettingsChange={(newSettings) => updateExpression(activeTabId, 'settings', newSettings)}
+            onExpSettingsChange={handleExpSettingsChange}
             audioAnalyzer={audioAnalyzer}
             isStreamMode={isStreamMode}
             onManualSave={manualSave}
