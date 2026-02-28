@@ -46,7 +46,7 @@ function App() {
     autoLaugh: false,
     autoSilence: false,
     silenceThreshold: 50,
-    switchCooldown: 2.0,
+    switchCooldown: 1.0,
     bgmVolume: 50,
     crossfade: false,
     crossfadeSpeed: 150

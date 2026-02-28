@@ -139,7 +139,7 @@ export default function CalibrationModal({
                         <input
                             type="range"
                             min="50"
-                            max="500"
+                            max="350"
                             step="10"
                             value={globalSettings.crossfadeSpeed || 150}
                             onChange={(e) => updateGlobal('crossfadeSpeed', parseInt(e.target.value, 10))}
