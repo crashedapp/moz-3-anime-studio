@@ -379,28 +379,39 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
 
             // --- Laugh Detection Math ---
             // Condition 1: Peak volume recently was high (absorbs dips in 'ha-ha' rhythm)
-            const isLoud = maxVol > 0.25;
-            // Condition 2: Pitch is slightly higher than baseline (breathy laughs lower this requirement)
-            const isHighPitch = smoothedPitch > (calibratedNormal * 1.10);
+            const isLoud = maxVol > 0.20;
+            // Condition 2: Pitch is slightly higher than baseline, OR it's a very loud laugh burst
+            const isHighPitch = smoothedPitch > (calibratedNormal * 1.10) || maxVol > 0.50;
             // Condition 3: Envelope fluctuates rapidly (rhythm of laugh)
             const hasRhythm = volVariance > 0.08;
 
             // Anti-False-Positive Filters (Click / Keyboard rejection)
             let lowEnergy = 0;
             let highEnergy = 0;
-            const midBin = Math.floor(2000 / binSize); // Check energy below 2kHz vs above 2kHz
-            for (let i = startBin; i < dataArray.length; i++) {
-                if (i < midBin) lowEnergy += dataArray[i];
-                else highEnergy += dataArray[i];
+            let lowBinsCount = 0;
+            let highBinsCount = 0;
+            const midBin = Math.floor(1500 / binSize); // 1.5kHz upper end of strong voice fundamentals
+            const highBin = Math.floor(6000 / binSize); // Ignore ultra-high ambient hiss
+            
+            for (let i = startBin; i < highBin && i < dataArray.length; i++) {
+                if (i < midBin) {
+                    lowEnergy += dataArray[i];
+                    lowBinsCount++;
+                } else {
+                    highEnergy += dataArray[i];
+                    highBinsCount++;
+                }
             }
-            // Vocal sounds concentrate energy in fundamentals and lower formants.
-            // Sharp noises (clicks, keyboard) have lots of high-frequency white noise.
-            // Relaxed from 2.0 to 1.2 because breathy laughing/wheezing contains lots of high frequencies.
-            const isVoiceLike = lowEnergy > (highEnergy * 1.2);
+            const avgLow = lowBinsCount > 0 ? (lowEnergy / lowBinsCount) : 0;
+            const avgHigh = highBinsCount > 0 ? (highEnergy / highBinsCount) : 0;
+
+            // Vocal sounds (vowels) concentrate energy massively below 1.5kHz.
+            // Sharp transients (keyboard clicks) are broadband noise where avgLow ≈ avgHigh.
+            const isVoiceLike = avgLow > (avgHigh * 1.5);
 
             // A laugh should be sustained longer than a single mechanical click or lip smack
             const framesAboveThreshold = volHistory.filter(v => v > 0.10).length;
-            const isSustained = framesAboveThreshold >= 5; // At least ~80ms of decent volume
+            const isSustained = framesAboveThreshold >= 6; // At least ~100ms of decent volume
 
             // Gate Node / Switch Logic
             if (globalSettings.autoLaugh && isLoud && isHighPitch && hasRhythm && isVoiceLike && isSustained) {
