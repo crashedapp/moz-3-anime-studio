@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 
-export default function useAnimation(audioLevel, expSettings, activeMouthCount) {
+export default function useAnimation(audioData, expSettings, activeMouthCount) {
     const [currentEye, setCurrentEye] = useState('eyeOpen');
     const [mouthIndex, setMouthIndex] = useState(0);
-    const [transform, setTransform] = useState({ scaleY: 1, translateY: 0, translateX: 0 });
+    const [transform, setTransform] = useState({ scaleX: 1, scaleY: 1, translateY: 0, translateX: 0, rotateZ: 0, eyeX: 0, eyeY: 0 });
+    const tiltDataRef = useRef({ rot: 0, scale: 1, eyeX: 0, eyeY: 0 });
 
     const blinkTimeoutRef = useRef(null);
 
@@ -50,15 +51,15 @@ export default function useAnimation(audioLevel, expSettings, activeMouthCount) 
         };
     }, []);
 
-    const audioLevelRef = useRef(audioLevel);
+    const audioDataRef = useRef(audioData);
     const expSettingsRef = useRef(expSettings);
     const activeMouthCountRef = useRef(activeMouthCount);
 
     useEffect(() => {
-        audioLevelRef.current = audioLevel;
+        audioDataRef.current = audioData;
         expSettingsRef.current = expSettings;
         activeMouthCountRef.current = activeMouthCount;
-    }, [audioLevel, expSettings, activeMouthCount]);
+    }, [audioData, expSettings, activeMouthCount]);
 
     // Frame-by-frame loop for continuous animation
     useEffect(() => {
@@ -66,7 +67,9 @@ export default function useAnimation(audioLevel, expSettings, activeMouthCount) 
         const startTime = performance.now();
 
         const loop = (time) => {
-            const currentAudioLevel = audioLevelRef.current;
+            const currentAudioLevel = audioDataRef.current?.level || 0;
+            const currentPitch = audioDataRef.current?.pitch || 300;
+            const averagePitch = audioDataRef.current?.calibratedNormal || 300;
             const { preset, idleAnim, breathSpeed } = expSettingsRef.current;
             const currentMouthCount = activeMouthCountRef.current;
 
@@ -110,7 +113,29 @@ export default function useAnimation(audioLevel, expSettings, activeMouthCount) 
                 }
             }
 
-            setTransform({ scaleY: sY, translateY: tY, translateX: tX });
+            // Auto Head Tilt & Parallax (Pseudo-3D)
+            let targetRotation = (currentPitch - averagePitch) * 0.05;
+            targetRotation = Math.max(-10, Math.min(10, targetRotation));
+            let targetEyeOffsetX = targetRotation * -0.5;
+            let targetEyeOffsetY = currentAudioLevel * -2.0;
+            let targetScaleTotal = 1.0 + (currentAudioLevel * 0.03);
+
+            const currentTiltData = tiltDataRef.current;
+            const smoothFactor = 0.15;
+            currentTiltData.rot += (targetRotation - currentTiltData.rot) * smoothFactor;
+            currentTiltData.scale += (targetScaleTotal - currentTiltData.scale) * smoothFactor;
+            currentTiltData.eyeX += (targetEyeOffsetX - currentTiltData.eyeX) * smoothFactor;
+            currentTiltData.eyeY += (targetEyeOffsetY - currentTiltData.eyeY) * smoothFactor;
+
+            setTransform({
+                scaleX: currentTiltData.scale,
+                scaleY: sY + (currentTiltData.scale - 1.0),
+                translateY: tY,
+                translateX: tX,
+                rotateZ: currentTiltData.rot,
+                eyeX: currentTiltData.eyeX,
+                eyeY: currentTiltData.eyeY
+            });
 
             animationFrame = requestAnimationFrame(loop);
         };

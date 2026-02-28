@@ -447,7 +447,7 @@ function App() {
   const activeMouthCount = activeMouths.length;
 
   const { currentEye, mouthIndex, transform } = useAnimation(
-    audioAnalyzer.level,
+    audioAnalyzer,
     activeExpression.settings,
     activeMouthCount
   );

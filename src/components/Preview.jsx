@@ -25,11 +25,12 @@ export default function Preview({ globalSettings, parts, transform, currentEye, 
                     <div
                         className="preview-canvas"
                         style={{
-                            transform: `translate(${transform.translateX}px, ${transform.translateY}px) scaleY(${transform.scaleY})`
+                            transform: `translate(${transform.translateX}px, ${transform.translateY}px) scale(${transform.scaleX || 1}, ${transform.scaleY}) rotate(${transform.rotateZ || 0}deg)`,
+                            transformOrigin: 'bottom center'
                         }}
                     >
                         {currentMouthKey && <img src={parts[currentMouthKey]} className="avatar-layer" style={{ zIndex: 1 }} alt="base/mouth" />}
-                        {parts[currentEye] && <img src={parts[currentEye]} className="avatar-layer" style={{ zIndex: 3 }} alt="eye" />}
+                        {parts[currentEye] && <img src={parts[currentEye]} className="avatar-layer" style={{ zIndex: 3, transform: `translate(${transform.eyeX || 0}px, ${transform.eyeY || 0}px)` }} alt="eye" />}
                     </div>
                 </TransformBox>
             </div>

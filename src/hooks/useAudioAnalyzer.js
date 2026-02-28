@@ -9,6 +9,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
     const [isActive, setIsActiveState] = useState(false);
     const [level, setLevel] = useState(0); // 0-1
     const [detectedTone, setDetectedTone] = useState(null); // 'laugh', 'silence', 'normal'
+    const [pitch, setPitch] = useState(0);
 
     // Audio File Elements
     const [audioFile, setAudioFile] = useState(null);
@@ -321,6 +322,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         const silenceMaxVol = 0.05;
 
         if (normalized <= silenceMaxVol) {
+            setPitch(calibratedNormal);
             if (silenceStartRef.current === null) {
                 silenceStartRef.current = time;
             } else {
@@ -367,6 +369,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
             if (recentPitchesRef.current.length > 0) {
                 smoothedPitch = recentPitchesRef.current.reduce((a, b) => a + b, 0) / recentPitchesRef.current.length;
             }
+            setPitch(smoothedPitch);
 
             // --- Learning Calibration Phase ---
             if (calibrationPhase !== 'idle' && normalized > 0.1 && smoothedPitch > 50) {
@@ -415,7 +418,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
     }, [initialCalibratedNormal]);
 
     return {
-        isActive, toggleMic, level, detectedTone,
+        isActive, toggleMic, level, pitch, detectedTone,
         audioDevices, selectedDeviceId, changeDevice,
         calibrationPhase, startCalibration, resetCalibration,
         calibratedNormal,
