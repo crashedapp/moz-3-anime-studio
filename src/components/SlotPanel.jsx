@@ -25,7 +25,7 @@ export default function SlotPanel({ parts, onPartChange, tabName, onResetTransfo
             <div className="slot-group">
                 <h3>モデルと口（口パク差分）</h3>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '12px', lineHeight: '1.4' }}>
-                    アップロードした口パク差分の数だけ音量段階に合わせて表示されるよ。（最大4枚）
+                    アップロードした口パク差分の数だけ音量段階に合わせて表示されるよ。（最大4枚、背景透過したPNG形式で入れてね）
                 </p>
                 <div className="drop-zones-grid">
                     {mouthConfigs.map(config => (
