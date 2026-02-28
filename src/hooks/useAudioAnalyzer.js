@@ -379,9 +379,9 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
 
             // --- Laugh Detection Math ---
             // Condition 1: Peak volume recently was high (absorbs dips in 'ha-ha' rhythm)
-            const isLoud = maxVol > 0.20;
+            const isLoud = maxVol > 0.30;
             // Condition 2: Pitch is slightly higher than baseline, OR it's a very loud laugh burst
-            const isHighPitch = smoothedPitch > (calibratedNormal * 1.10) || maxVol > 0.50;
+            const isHighPitch = smoothedPitch > (calibratedNormal * 1.15) || maxVol > 0.60;
             // Condition 3: Envelope fluctuates rapidly (rhythm of laugh)
             const hasRhythm = volVariance > 0.08;
 
@@ -409,12 +409,22 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
             // Sharp transients (keyboard clicks) are broadband noise where avgLow ≈ avgHigh.
             const isVoiceLike = avgLow > (avgHigh * 1.5);
 
+            // Transient Attack (Click) Rejection
+            // A sharp click/keyboard hit causes the volume to spike instantly.
+            // Vocal cords require time to ramp up (attack time).
+            let maxAttackSlope = 0;
+            for (let i = 1; i < volHistory.length; i++) {
+                const diff = volHistory[i] - volHistory[i-1];
+                if (diff > maxAttackSlope) maxAttackSlope = diff;
+            }
+            const isNotClick = maxAttackSlope < 0.45; // Reject instant 45%+ jumps in a single 16ms frame
+
             // A laugh should be sustained longer than a single mechanical click or lip smack
             const framesAboveThreshold = volHistory.filter(v => v > 0.10).length;
             const isSustained = framesAboveThreshold >= 6; // At least ~100ms of decent volume
 
             // Gate Node / Switch Logic
-            if (globalSettings.autoLaugh && isLoud && isHighPitch && hasRhythm && isVoiceLike && isSustained) {
+            if (globalSettings.autoLaugh && isLoud && isHighPitch && hasRhythm && isVoiceLike && isSustained && isNotClick) {
                 commitToneWithBuffer('laugh');
             } else {
                 commitToneWithBuffer('normal');
