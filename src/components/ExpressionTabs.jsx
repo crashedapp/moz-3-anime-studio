@@ -52,7 +52,7 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
             alert("最後の表情は削除できません。");
             return;
         }
-        if (window.confirm("この表情を削除してもよろしいですか？")) {
+        if (window.confirm("このタブの削除しますか？")) {
             const newTabs = tabs.filter(t => t.id !== id);
             setTabs(newTabs);
             if (activeId === id) {

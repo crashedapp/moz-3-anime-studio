@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain, systemPreferences } = electron;
 import path from 'path';
 
 const isDev = !app.isPackaged;
+app.setName('MOZ-3 Anime Studio');
 
 function createWindow() {
     const win = new BrowserWindow({

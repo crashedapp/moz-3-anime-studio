@@ -308,7 +308,7 @@ function App() {
         globalSettings,
         calibratedNormal: audioAnalyzer.calibratedNormal
       });
-      window.alert('手動セーブが完了しました！リロードしてテストしてみてください。');
+      window.alert('現在の状態をセーブしたよ！');
     } catch (e) {
       // alert already handled in storage.js
     }
