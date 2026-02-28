@@ -45,14 +45,14 @@ function App() {
         eyeHalf: './demo/default_demo/eyes/eye_half.png',
         eyeClosed: './demo/default_demo/eyes/eye_close.png'
       },
-      settings: { ...DEFAULT_EXP_SETTINGS }
+      settings: { ...DEFAULT_EXP_SETTINGS, preset: 'poyon', breathSpeed: 15 }
     },
     {
       id: '2',
       name: 'LOL（デモ）',
       keybind: '2',
       parts: { ...DEFAULT_PARTS, mouth0: './demo/lol_demo/base/laugh.png' },
-      settings: { ...DEFAULT_EXP_SETTINGS, preset: 'poyon' }
+      settings: { ...DEFAULT_EXP_SETTINGS, preset: 'nigiyaka' }
     },
     {
       id: '3',
@@ -66,12 +66,12 @@ function App() {
   const [globalSettings, setGlobalSettings] = useState({
     sensitivity: 50,
     bgColor: 'transparent',
-    autoLaugh: false,
-    autoSilence: false,
+    autoLaugh: true,
+    autoSilence: true,
     silenceThreshold: 50,
     switchCooldown: 1.0,
     bgmVolume: 50,
-    crossfade: false,
+    crossfade: true,
     crossfadeSpeed: 150
   });
 
