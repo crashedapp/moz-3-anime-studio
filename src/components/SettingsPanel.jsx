@@ -77,14 +77,8 @@ export default function SettingsPanel({
                     </div>
                     <div className="bg-toggles">
                         <button
-                            className={`bg-toggle-btn ${expSettings.idleAnim === 'none' ? 'active' : ''}`}
-                            onClick={() => updateExp('idleAnim', 'none')}
-                        >
-                            なし
-                        </button>
-                        <button
                             className={`bg-toggle-btn ${expSettings.idleAnim === 'breathing' ? 'active' : ''}`}
-                            onClick={() => updateExp('idleAnim', 'breathing')}
+                            onClick={() => updateExp('idleAnim', expSettings.idleAnim === 'breathing' ? 'none' : 'breathing')}
                         >
                             呼吸
                         </button>
@@ -115,7 +109,7 @@ export default function SettingsPanel({
                     </div>
                     <div className="preset-options">
                         {[
-                            { id: 'off', label: 'なし' },
+                            { id: 'nigiyaka', label: 'にぎやか' },
                             { id: 'poyon', label: 'のびる' },
                             { id: 'pyonpyon', label: 'はねる' },
                             { id: 'bibibi', label: 'ふるえる' }
@@ -123,7 +117,7 @@ export default function SettingsPanel({
                             <button
                                 key={preset.id}
                                 className={`preset-btn ${expSettings.preset === preset.id ? 'active' : ''}`}
-                                onClick={() => updateExp('preset', preset.id)}
+                                onClick={() => updateExp('preset', expSettings.preset === preset.id ? 'off' : preset.id)}
                             >
                                 {preset.label}
                             </button>

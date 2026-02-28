@@ -114,11 +114,18 @@ export default function useAnimation(audioData, expSettings, activeMouthCount) {
             }
 
             // Auto Head Tilt & Parallax (Pseudo-3D)
-            let targetRotation = (currentPitch - averagePitch) * 0.05;
-            targetRotation = Math.max(-10, Math.min(10, targetRotation));
-            let targetEyeOffsetX = targetRotation * -0.5;
-            let targetEyeOffsetY = currentAudioLevel * -2.0;
-            let targetScaleTotal = 1.0 + (currentAudioLevel * 0.03);
+            let targetRotation = 0;
+            let targetEyeOffsetX = 0;
+            let targetEyeOffsetY = 0;
+            let targetScaleTotal = 1.0;
+
+            if (isTalking && preset === 'nigiyaka') {
+                targetRotation = (currentPitch - averagePitch) * 0.05;
+                targetRotation = Math.max(-10, Math.min(10, targetRotation));
+                targetEyeOffsetX = targetRotation * -0.5;
+                targetEyeOffsetY = currentAudioLevel * -2.0;
+                targetScaleTotal = 1.0 + (currentAudioLevel * 0.03);
+            }
 
             const currentTiltData = tiltDataRef.current;
             const smoothFactor = 0.15;
