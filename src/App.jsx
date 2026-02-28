@@ -33,9 +33,32 @@ function App() {
   const [expressions, setExpressions] = useState([
     {
       id: '1',
-      name: 'デフォルトのタブ',
+      name: 'デフォルト（デモ）',
       keybind: '1',
-      parts: { ...DEFAULT_PARTS },
+      parts: {
+        ...DEFAULT_PARTS,
+        mouth0: './demo/default_demo/base/base_1.png',
+        mouth1: './demo/default_demo/base/base_kuchi_s_2.png',
+        mouth2: './demo/default_demo/base/base_kuchi_m_3.png',
+        mouth3: './demo/default_demo/base/base_kuchi_l_4.png',
+        eyeOpen: './demo/default_demo/eyes/eye_open.png',
+        eyeHalf: './demo/default_demo/eyes/eye_half.png',
+        eyeClosed: './demo/default_demo/eyes/eye_close.png'
+      },
+      settings: { ...DEFAULT_EXP_SETTINGS }
+    },
+    {
+      id: '2',
+      name: 'LOL（デモ）',
+      keybind: '2',
+      parts: { ...DEFAULT_PARTS, mouth0: './demo/lol_demo/base/laugh.png' },
+      settings: { ...DEFAULT_EXP_SETTINGS, preset: 'poyon' }
+    },
+    {
+      id: '3',
+      name: '無言（デモ）',
+      keybind: '3',
+      parts: { ...DEFAULT_PARTS, mouth0: './demo/silence_demo/base/sleep.png' },
       settings: { ...DEFAULT_EXP_SETTINGS }
     }
   ]);
