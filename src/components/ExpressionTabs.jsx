@@ -29,8 +29,8 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
     }, [editingId]);
 
     const handleAdd = () => {
-        if (tabs.length >= 6) {
-            alert("タブは最大6つまでです。");
+        if (tabs.length >= 8) {
+            alert("タブは最大8つまでです。");
             return;
         }
 
@@ -74,12 +74,12 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
         if (editingId) {
             const finalName = editName.trim() === "" ? "無名" : editName;
 
-            // Validation: Ensure at least one tab is not a LOL tab
-            if (finalName.startsWith('LOL')) {
+            // Validation: Ensure at least one tab is not a shift tab
+            if (finalName.includes('変化')) {
                 const otherTabs = tabs.filter(t => t.id !== editingId);
-                const nonLolOtherTabs = otherTabs.filter(t => !t.name.startsWith('LOL'));
+                const nonLolOtherTabs = otherTabs.filter(t => !t.name.includes('変化'));
                 if (nonLolOtherTabs.length === 0) {
-                    alert("すべてのタブをLOL指定できません。最低でも１つのタブは別の名前にしてくださいね！");
+                    alert("すべてのタブを「変化」指定できません。最低でも１つのタブは別の名前にしてくださいね！");
                     setEditingId(null);
                     return;
                 }
@@ -128,7 +128,7 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
                     )}
                 </div>
             ))}
-            {tabs.length < 6 && (
+            {tabs.length < 8 && (
                 <button className="add-tab-btn" onClick={handleAdd} title="新しいタブを追加">+</button>
             )}
         </div>

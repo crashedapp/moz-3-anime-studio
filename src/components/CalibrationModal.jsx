@@ -151,7 +151,7 @@ export default function CalibrationModal({
                     {/* 笑い声設定 */}
                     <div style={{ marginBottom: '16px', padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 'bold', color: '#fbbf24' }}>笑い声センサー</span>
+                            <span style={{ fontWeight: 'bold', color: '#fbbf24' }}>ピッチセンサー</span>
                             <button
                                 className={`bg-toggle-btn ${globalSettings.autoLaugh ? 'active' : ''}`}
                                 onClick={() => updateGlobal('autoLaugh', !globalSettings.autoLaugh)}
@@ -161,7 +161,7 @@ export default function CalibrationModal({
                             </button>
                         </div>
                         <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '12px' }}>
-                            ONにすると、測定した声より高い声や、笑い声を検知して「LOL」と含めて作成したタブのモデルに自動的に切り替わります。笑っちゃったときにモデルの表情を変化させることができるってわけ。
+                            ONにすると声のピッチの変化に反応して、「変化」と含めて作成したタブのモデルに自動的に切り替わります。「変化タブ」を複数設定しておくことで、ランダムで変化タブに切り替わります。
                         </p>
                     </div>
 

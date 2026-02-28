@@ -49,7 +49,7 @@ function App() {
     },
     {
       id: '2',
-      name: 'LOL（デモ）',
+      name: '変化（デモ）',
       keybind: '2',
       parts: { ...DEFAULT_PARTS, mouth0: './demo/lol_demo/base/laugh.png' },
       settings: { ...DEFAULT_EXP_SETTINGS, preset: 'nigiyaka' }
@@ -390,14 +390,14 @@ function App() {
 
     if (!tone || tone === 'normal') {
       const currentName = expressions.find(e => e.id === activeTabId)?.name || '';
-      if (!currentName.startsWith('LOL') && !currentName.startsWith('無言')) {
+      if (!currentName.includes('変化') && !currentName.startsWith('無言')) {
         lastManualTabRef.current = activeTabId;
       }
     } else {
       // If we ARE auto-switched, but activeTabId is clearly a manual tab 
       // (because the user clicked it while laughing/silent), update it anyway.
       const currentName = expressions.find(e => e.id === activeTabId)?.name || '';
-      if (!currentName.startsWith('LOL') && !currentName.startsWith('無言')) {
+      if (!currentName.includes('変化') && !currentName.startsWith('無言')) {
         lastManualTabRef.current = activeTabId;
       }
     }
@@ -419,9 +419,9 @@ function App() {
 
     // Laugh: Random LOL Tab Selection
     if (tone === 'laugh' && globalSettings.autoLaugh) {
-      const lolTabs = expressions.filter(exp => exp.name.startsWith('LOL'));
+      const lolTabs = expressions.filter(exp => exp.name.includes('変化'));
       if (lolTabs.length > 0) {
-        const nonLolTabs = expressions.filter(exp => !exp.name.startsWith('LOL'));
+        const nonLolTabs = expressions.filter(exp => !exp.name.includes('変化'));
         // Safety check: Only auto-switch if there is at least 1 non-LOL tab
         if (nonLolTabs.length >= 1) {
           let availableLolTabs = lolTabs;
@@ -439,7 +439,7 @@ function App() {
     if (tone === 'silence' && globalSettings.autoSilence) {
       const silenceTabs = expressions.filter(exp => exp.name.startsWith('無言'));
       if (silenceTabs.length > 0) {
-        const nonAutoTabs = expressions.filter(exp => !exp.name.startsWith('無言') && !exp.name.startsWith('LOL'));
+        const nonAutoTabs = expressions.filter(exp => !exp.name.startsWith('無言') && !exp.name.includes('変化'));
         // Safety check: Only auto-switch if there is at least 1 normal tab
         if (nonAutoTabs.length >= 1) {
           // If already on a silence tab, STAY on it. Don't re-randomize while still silent.
@@ -461,14 +461,14 @@ function App() {
     } else {
       // Revert back if we are currently on an auto-switch tab and the tone ended
       const currentTabName = expressions.find(exp => exp.id === activeTabId)?.name || '';
-      if (currentTabName.startsWith('LOL') || currentTabName.startsWith('無言')) {
+      if (currentTabName.includes('変化') || currentTabName.startsWith('無言')) {
         // Check if the tab we want to return to still exists
         const manualTabExists = expressions.find(exp => exp.id === lastManualTabRef.current);
         if (manualTabExists) {
           setActiveTabId(lastManualTabRef.current);
         } else {
           // Fallback to the very first non-LOL/non-silence tab if the last manual tab is gone
-          const firstManual = expressions.find(exp => !exp.name.startsWith('LOL') && !exp.name.startsWith('無言'));
+          const firstManual = expressions.find(exp => !exp.name.includes('変化') && !exp.name.startsWith('無言'));
           if (firstManual) setActiveTabId(firstManual.id);
           else setActiveTabId(expressions[0].id);
         }
