@@ -33,7 +33,7 @@ export default function CalibrationModal({
         <div className="modal-overlay" onClick={onClose}>
             <div className="calibration-modal glass-panel" onClick={e => e.stopPropagation()}>
                 <button className="modal-close-btn" onClick={onClose}>×</button>
-                <h2 style={{ marginBottom: '24px', textAlign: 'center' }}>⚙️ 音声キャリブレーション設定</h2>
+                <h2 style={{ marginBottom: '24px', textAlign: 'center' }}>⚙️ いろんな設定</h2>
 
                 {/* --- マイク設定エリア --- */}
                 <div className="setting-section" style={{ padding: '16px', marginBottom: '24px' }}>
@@ -120,7 +120,7 @@ export default function CalibrationModal({
                     {/* 表情クロスフェード設定 */}
                     <div style={{ padding: '16px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', marginBottom: '16px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={{ fontWeight: 'bold', color: 'white' }}>表情クロスフェード（アニメ化）</span>
+                            <span style={{ fontWeight: 'bold', color: 'white' }}>表情切り替えスムーズ化</span>
                             <button
                                 className={`bg-toggle-btn ${globalSettings.crossfade ? 'active' : ''}`}
                                 onClick={() => updateGlobal('crossfade', !globalSettings.crossfade)}
@@ -130,10 +130,10 @@ export default function CalibrationModal({
                             </button>
                         </div>
                         <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px', marginBottom: '12px' }}>
-                            表情が切り替わる際、中割りを自動生成して滑らかに繋げます。
+                            表情が滑らかに切り替わるようする機能だよ。下の「滑らか速度」で切り替わり演出の速さを調節できるよ。
                         </p>
                         <div className="slider-header" style={{ fontSize: '0.85rem' }}>
-                            <span>フェード速度</span>
+                            <span>滑らか速度</span>
                             <span>{globalSettings.crossfadeSpeed || 150} ms</span>
                         </div>
                         <input
@@ -151,7 +151,7 @@ export default function CalibrationModal({
                     {/* 笑い声設定 */}
                     <div style={{ marginBottom: '16px', padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 'bold', color: '#fbbf24' }}>笑い声検知 (LOL切り替え)</span>
+                            <span style={{ fontWeight: 'bold', color: '#fbbf24' }}>笑い声センサー</span>
                             <button
                                 className={`bg-toggle-btn ${globalSettings.autoLaugh ? 'active' : ''}`}
                                 onClick={() => updateGlobal('autoLaugh', !globalSettings.autoLaugh)}
@@ -197,13 +197,13 @@ export default function CalibrationModal({
                     {/* 表情安定化（共通） */}
                     <div style={{ padding: '16px', border: '1px solid var(--glass-border)', borderRadius: '8px' }}>
                         <div style={{ marginBottom: '8px' }}>
-                            <span style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>表情維持タイマー（安定化）</span>
+                            <span style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>切り替わった表情を維持する時間</span>
                             <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
                                 一度変化した表情を、指定した秒数は強制的に維持してチラつきを防止します。
                             </p>
                         </div>
                         <div className="slider-header" style={{ fontSize: '0.85rem', marginTop: '12px' }}>
-                            <span>ロック秒数</span>
+                            <span>維持秒数</span>
                             <span>{globalSettings.switchCooldown?.toFixed(1) || 1.0} 秒</span>
                         </div>
                         <input
