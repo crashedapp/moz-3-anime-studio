@@ -334,9 +334,6 @@ body {
 
 /* Modal and Gear Button Styles */
 .gear-btn {
-  position: fixed;
-  top: 16px;
-  right: 16px;
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
   color: var(--text-primary);
@@ -359,9 +356,6 @@ body {
 }
 
 .header-stream-btn {
-  position: fixed;
-  top: 16px;
-  right: 80px;
   background: var(--glass-bg);
   border: 1px solid var(--accent-color);
   color: var(--text-primary);
