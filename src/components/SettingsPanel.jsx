@@ -36,7 +36,7 @@ export default function SettingsPanel({
     return (
         <div className="settings-container">
             <div className="setting-section glass-panel" style={{ padding: '16px', marginBottom: '24px' }}>
-                <h3>🎤 マイクとモデルの動き</h3>
+                <h3>🎤 Mic and Model Movement</h3>
 
                 <div style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}>
                     <button
@@ -58,7 +58,7 @@ export default function SettingsPanel({
 
                 <div style={{ marginBottom: '16px' }}>
                     <div className="slider-header">
-                        <span>マイク感度</span>
+                        <span>Mic Sensitivity</span>
                         <span>{globalSettings.sensitivity}%</span>
                     </div>
                     <input
@@ -74,14 +74,14 @@ export default function SettingsPanel({
 
                 <div style={{ marginBottom: '16px' }}>
                     <div className="slider-header" style={{ marginBottom: '8px' }}>
-                        <span>待機中の動き</span>
+                        <span>Idle Animation</span>
                     </div>
                     <div className="bg-toggles">
                         <button
                             className={`bg-toggle-btn ${expSettings.idleAnim === 'breathing' ? 'active' : ''}`}
                             onClick={() => updateExp('idleAnim', expSettings.idleAnim === 'breathing' ? 'none' : 'breathing')}
                         >
-                            呼吸
+                            Breathing
                         </button>
                     </div>
                 </div>
@@ -89,7 +89,7 @@ export default function SettingsPanel({
                 {expSettings.idleAnim === 'breathing' && (
                     <div style={{ marginBottom: '16px' }}>
                         <div className="slider-header">
-                            <span>呼吸の速さ</span>
+                            <span>Breathing Speed</span>
                             <span>{expSettings.breathSpeed}%</span>
                         </div>
                         <input
@@ -106,14 +106,14 @@ export default function SettingsPanel({
 
                 <div>
                     <div className="slider-header" style={{ marginBottom: '8px' }}>
-                        <span>おしゃべりアニメ</span>
+                        <span>Talking Animation</span>
                     </div>
                     <div className="preset-options">
                         {[
-                            { id: 'nigiyaka', label: 'にぎやか' },
-                            { id: 'poyon', label: 'のびる' },
-                            { id: 'pyonpyon', label: 'はねる' },
-                            { id: 'bibibi', label: 'ふるえる' }
+                            { id: 'nigiyaka', label: 'Lively' },
+                            { id: 'poyon', label: 'Stretch' },
+                            { id: 'pyonpyon', label: 'Bounce' },
+                            { id: 'bibibi', label: 'Shiver' }
                         ].map(preset => (
                             <button
                                 key={preset.id}
@@ -130,18 +130,18 @@ export default function SettingsPanel({
             </div>
 
             <div className="setting-section glass-panel" style={{ padding: '16px', marginBottom: '24px' }}>
-                <h3>🎨 背景の色</h3>
+                <h3>🎨 Background Color</h3>
 
                 <div>
                     <div className="slider-header" style={{ marginBottom: '8px' }}>
-                        <span>色</span>
+                        <span>Color</span>
                     </div>
                     <div className="bg-toggles">
                         <button
                             className={`bg-toggle-btn ${globalSettings.bgColor === 'transparent' ? 'active' : ''}`}
                             onClick={() => updateGlobal('bgColor', 'transparent')}
                         >
-                            透過
+                            Transparent
                         </button>
                         <button
                             className={`bg-toggle-btn ${globalSettings.bgColor === 'green' ? 'active' : ''}`}
@@ -166,7 +166,7 @@ export default function SettingsPanel({
             </div>
 
             <div className="setting-section glass-panel" style={{ padding: '16px' }}>
-                <h3>🎵 オーディオファイルで口パク</h3>
+                <h3>🎵 Lip-Sync with Audio File</h3>
 
                 <div style={{ marginBottom: '12px' }}>
                     <input
@@ -184,7 +184,7 @@ export default function SettingsPanel({
                         {audioAnalyzer.audioFileName || "📂 Upload Audio File"}
                     </button>
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', textAlign: 'center' }}>
-                        自分で用意した音声をアップロードしてモデルを口パクできるよ
+                        Upload your own audio to have the model lip-sync
                     </p>
                 </div>
 
@@ -216,19 +216,19 @@ export default function SettingsPanel({
             </div>
 
             <div className="setting-section glass-panel" style={{ padding: '16px' }}>
-                <h3>🎵 BGM設定</h3>
+                <h3>🎵 BGM Settings</h3>
 
                 <div style={{ marginBottom: '16px' }}>
                     <div className="slider-header" style={{ marginBottom: '8px' }}>
-                        <span>BGMを選択</span>
+                        <span>Select BGM</span>
                     </div>
                     <select
                         style={{ width: '100%', padding: '8px', background: 'var(--glass-bg)', color: 'var(--text-primary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)', marginBottom: '12px' }}
                         value={selectedBgm}
                         onChange={(e) => onBgmChange(e.target.value)}
                     >
-                        <option value="none">なし</option>
-                        <option value="random">ランダム再生</option>
+                        <option value="none">None</option>
+                        <option value="random">Random Playback</option>
                         {bgmList.map((bgm, i) => (
                             <option key={i} value={bgm}>{bgm}</option>
                         ))}
@@ -242,7 +242,7 @@ export default function SettingsPanel({
                                 disabled={selectedBgm === 'none'}
                                 style={{ opacity: selectedBgm === 'none' ? 0.5 : 1, cursor: selectedBgm === 'none' ? 'not-allowed' : 'pointer' }}
                             >
-                                ⏸ 停止
+                                ⏸ Pause
                             </button>
                         ) : (
                             <button
@@ -251,7 +251,7 @@ export default function SettingsPanel({
                                 disabled={selectedBgm === 'none'}
                                 style={{ opacity: selectedBgm === 'none' ? 0.5 : 1, cursor: selectedBgm === 'none' ? 'not-allowed' : 'pointer' }}
                             >
-                                ▶ 再生
+                                ▶ Play
                             </button>
                         )}
                         <button
@@ -260,12 +260,12 @@ export default function SettingsPanel({
                             disabled={selectedBgm === 'none'}
                             style={{ opacity: selectedBgm === 'none' ? 0.5 : 1, cursor: selectedBgm === 'none' ? 'not-allowed' : 'pointer' }}
                         >
-                            ⏹ リセット
+                            ⏹ Stop
                         </button>
                     </div>
                     <div style={{ marginTop: '16px' }}>
                         <div className="slider-header" style={{ marginBottom: '8px' }}>
-                            <span>音量</span>
+                            <span>Volume</span>
                             <span>{globalSettings.bgmVolume ?? 50}%</span>
                         </div>
                         <input
@@ -278,16 +278,16 @@ export default function SettingsPanel({
                         />
                     </div>
                     <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '24px' }}>
-                        音楽がなくて寂しいときはモタロが作曲したプリセットBGMを再生するのもオススメ
+                        If you feel lonely without music, we recommend playing the preset BGM composed by Motaro
                     </p>
                 </div>
             </div>
 
-            {/* セーブ・リセット設定 */}
+            {/* Save & Reset Settings */}
             <div className="setting-section" style={{ border: '1px solid var(--accent-color)', background: 'rgba(6, 182, 212, 0.05)', padding: '16px' }}>
-                <h3 style={{ marginBottom: '12px', color: 'var(--accent-color)' }}>💾 セーブ・初期化</h3>
+                <h3 style={{ marginBottom: '12px', color: 'var(--accent-color)' }}>💾 Save & Reset</h3>
                 <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginBottom: '12px' }}>
-                    設定は自動で保存されますが、確実にデータを残したい場合は手動セーブをお使いください。最初からやり直したい場合は全設定をリセットできます。
+                    Settings are saved automatically, but you can use manual save if you want to ensure data is preserved. You can reset all settings to start over.
                 </p>
                 <div style={{ display: 'flex', gap: '8px' }}>
                     <button 
@@ -295,14 +295,14 @@ export default function SettingsPanel({
                       onClick={onManualSave}
                       style={{ flex: 1, background: 'var(--accent-color)', color: 'black', fontWeight: 'bold' }}
                     >
-                        手動でセーブ
+                        Manual Save
                     </button>
                     <button 
                       className="learning-btn" 
                       onClick={onResetData}
                       style={{ flex: 1, background: 'rgba(255, 50, 50, 0.2)', border: '1px solid #ef4444', color: '#fca5a5' }}
                     >
-                        全データリセット
+                        Reset All Data
                     </button>
                 </div>
             </div>

@@ -40,7 +40,7 @@ function App() {
   const [expressions, setExpressions] = useState([
     {
       id: '1',
-      name: 'デフォルト（デモ）',
+      name: 'Default (Demo)',
       keybind: '1',
       parts: {
         ...DEFAULT_PARTS,
@@ -56,14 +56,14 @@ function App() {
     },
     {
       id: '2',
-      name: '変化（デモ）',
+      name: 'Change (Demo)',
       keybind: '2',
       parts: { ...DEFAULT_PARTS, mouth0: './demo/lol_demo/base/laugh.png' },
       settings: { ...DEFAULT_EXP_SETTINGS, preset: 'nigiyaka' }
     },
     {
       id: '3',
-      name: '無言（デモ）',
+      name: 'Silence (Demo)',
       keybind: '3',
       parts: { ...DEFAULT_PARTS, mouth0: './demo/silence_demo/base/sleep.png' },
       settings: { ...DEFAULT_EXP_SETTINGS }
@@ -136,8 +136,8 @@ function App() {
 
   const getBgmUrl = (filename) => {
     const isElectron = !!(window && window.process && window.process.type);
-    if (!isElectron) {
-      return `/BGM/${filename}`;
+    if (!isElectron || import.meta.env.DEV) {
+      return `/BGM/${encodeURIComponent(filename)}`;
     }
     const path = window.require('path');
     const processEnv = window.require('process');
@@ -341,19 +341,19 @@ function App() {
         globalSettings,
         calibratedNormal: audioAnalyzer.calibratedNormal
       });
-      window.alert('現在の状態をセーブしたよ！');
+      window.alert('Saved the current state!');
     } catch (e) {
       // alert already handled in storage.js
     }
   };
 
   const resetAllData = async () => {
-    if (window.confirm('本当にすべての設定とタブをリセットして初期状態に戻しますか？\n※自分で追加した画像設定などはすべて消去されます。')) {
+    if (window.confirm('Are you sure you want to reset all settings and tabs to their initial state?\n* Any custom image settings you added will be erased.')) {
       try {
         await clearAppData();
         window.location.reload();
       } catch (e) {
-        window.alert('リセットに失敗しました。');
+        window.alert('Failed to reset.');
       }
     }
   };
@@ -398,14 +398,14 @@ function App() {
 
     if (!tone || tone === 'normal') {
       const currentName = expressions.find(e => e.id === activeTabId)?.name || '';
-      if (!currentName.includes('変化') && !currentName.startsWith('無言')) {
+      if (!currentName.includes('Change') && !currentName.startsWith('Silence')) {
         lastManualTabRef.current = activeTabId;
       }
     } else {
       // If we ARE auto-switched, but activeTabId is clearly a manual tab 
       // (because the user clicked it while laughing/silent), update it anyway.
       const currentName = expressions.find(e => e.id === activeTabId)?.name || '';
-      if (!currentName.includes('変化') && !currentName.startsWith('無言')) {
+      if (!currentName.includes('Change') && !currentName.startsWith('Silence')) {
         lastManualTabRef.current = activeTabId;
       }
     }
@@ -427,9 +427,9 @@ function App() {
 
     // Laugh: Random LOL Tab Selection
     if (tone === 'laugh' && globalSettings.autoLaugh) {
-      const lolTabs = expressions.filter(exp => exp.name.includes('変化'));
+      const lolTabs = expressions.filter(exp => exp.name.includes('Change'));
       if (lolTabs.length > 0) {
-        const nonLolTabs = expressions.filter(exp => !exp.name.includes('変化'));
+        const nonLolTabs = expressions.filter(exp => !exp.name.includes('Change'));
         // Safety check: Only auto-switch if there is at least 1 non-LOL tab
         if (nonLolTabs.length >= 1) {
           let availableLolTabs = lolTabs;
@@ -443,16 +443,16 @@ function App() {
       }
     }
 
-    // Silence: Random 無言 Tab Selection
+    // Silence: Random Silence Tab Selection
     if (tone === 'silence' && globalSettings.autoSilence) {
-      const silenceTabs = expressions.filter(exp => exp.name.startsWith('無言'));
+      const silenceTabs = expressions.filter(exp => exp.name.startsWith('Silence'));
       if (silenceTabs.length > 0) {
-        const nonAutoTabs = expressions.filter(exp => !exp.name.startsWith('無言') && !exp.name.includes('変化'));
+        const nonAutoTabs = expressions.filter(exp => !exp.name.startsWith('Silence') && !exp.name.includes('Change'));
         // Safety check: Only auto-switch if there is at least 1 normal tab
         if (nonAutoTabs.length >= 1) {
           // If already on a silence tab, STAY on it. Don't re-randomize while still silent.
           const currentTab = expressions.find(exp => exp.id === activeTabId);
-          if (currentTab && currentTab.name.startsWith('無言')) {
+          if (currentTab && currentTab.name.startsWith('Silence')) {
             targetTabId = activeTabId;
           } else {
             const randomIndex = Math.floor(Math.random() * silenceTabs.length);
@@ -469,14 +469,14 @@ function App() {
     } else {
       // Revert back if we are currently on an auto-switch tab and the tone ended
       const currentTabName = expressions.find(exp => exp.id === activeTabId)?.name || '';
-      if (currentTabName.includes('変化') || currentTabName.startsWith('無言')) {
+      if (currentTabName.includes('Change') || currentTabName.startsWith('Silence')) {
         // Check if the tab we want to return to still exists
         const manualTabExists = expressions.find(exp => exp.id === lastManualTabRef.current);
         if (manualTabExists) {
           setActiveTabId(lastManualTabRef.current);
         } else {
           // Fallback to the very first non-LOL/non-silence tab if the last manual tab is gone
-          const firstManual = expressions.find(exp => !exp.name.includes('変化') && !exp.name.startsWith('無言'));
+          const firstManual = expressions.find(exp => !exp.name.includes('Change') && !exp.name.startsWith('Silence'));
           if (firstManual) setActiveTabId(firstManual.id);
           else setActiveTabId(expressions[0].id);
         }
@@ -507,7 +507,7 @@ function App() {
             className="header-title-container"
             onClick={() => setIsAboutModalOpen(true)}
             style={{ cursor: 'pointer', transition: 'opacity 0.2s' }}
-            title="このアプリについて"
+            title="About this app"
           >
             <img src="./logo.png" alt="Logo" className="header-logo" />
             <div className="header-title">MOZ-3 Anime Studio</div>
@@ -519,14 +519,14 @@ function App() {
             setTabs={setExpressions}
           />
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px', WebkitAppRegion: 'no-drag' }}>
-            <button className="header-stream-btn" onClick={() => setIsStreamMode(true)} title="配信モードを開始する">📺</button>
-            <button className="gear-btn" onClick={() => setIsModalOpen(true)} title="音声キャリブレーション設定">⚙️</button>
+            <button className="header-stream-btn" onClick={() => setIsStreamMode(true)} title="Start Stream Mode">📺</button>
+            <button className="gear-btn" onClick={() => setIsModalOpen(true)} title="Audio Calibration Settings">⚙️</button>
             <div style={{ width: '1px', height: '24px', background: 'var(--glass-border)', margin: '0 8px' }}></div>
             {/* Custom Window Controls */}
             <div className="window-controls" style={{ display: 'flex', gap: '4px' }}>
-              <button onClick={() => handleWindowControl('minimize')} className="win-btn" title="最小化">_</button>
-              <button onClick={() => handleWindowControl('maximize')} className="win-btn" title="最大化">□</button>
-              <button onClick={() => handleWindowControl('close')} className="win-btn close-btn" title="閉じる">×</button>
+              <button onClick={() => handleWindowControl('minimize')} className="win-btn" title="Minimize">_</button>
+              <button onClick={() => handleWindowControl('maximize')} className="win-btn" title="Maximize">□</button>
+              <button onClick={() => handleWindowControl('close')} className="win-btn close-btn" title="Close">×</button>
             </div>
           </div>
         </header>
@@ -590,9 +590,9 @@ function App() {
         <button
           className="exit-stream-btn"
           onClick={() => setIsStreamMode(false)}
-          title="Escキーでも解除できます"
+          title="Can also be exited with the Esc key"
         >
-          ✖ 配信モードを終了
+          ✖ Exit Stream Mode
         </button>
       )}
 

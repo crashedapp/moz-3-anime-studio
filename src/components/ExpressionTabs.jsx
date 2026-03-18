@@ -30,7 +30,7 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
 
     const handleAdd = () => {
         if (tabs.length >= 8) {
-            alert("タブは最大8つまでです。");
+            alert("Maximum of 8 tabs allowed.");
             return;
         }
 
@@ -39,7 +39,7 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
         const keybind = newIndex <= 9 ? String(newIndex) : '';
         setTabs([...tabs, {
             id: newId,
-            name: 'ダブルクリックでタブ名を編集',
+            name: 'Double click to edit tab name',
             keybind,
             parts: { ...DEFAULT_PARTS },
             settings: { ...DEFAULT_EXP_SETTINGS }
@@ -49,10 +49,10 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
     const handleDelete = (e, id) => {
         e.stopPropagation();
         if (tabs.length === 1) {
-            alert("最後の表情は削除できません。");
+            alert("The last expression cannot be deleted.");
             return;
         }
-        if (window.confirm("このタブを削除する？")) {
+        if (window.confirm("Do you want to delete this tab?")) {
             const newTabs = tabs.filter(t => t.id !== id);
             setTabs(newTabs);
             if (activeId === id) {
@@ -72,14 +72,14 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
 
     const commitNameChange = () => {
         if (editingId) {
-            const finalName = editName.trim() === "" ? "無名" : editName;
+            const finalName = editName.trim() === "" ? "Unnamed" : editName;
 
             // Validation: Ensure at least one tab is not a shift tab
-            if (finalName.includes('変化')) {
+            if (finalName.includes('Change')) {
                 const otherTabs = tabs.filter(t => t.id !== editingId);
-                const nonLolOtherTabs = otherTabs.filter(t => !t.name.includes('変化'));
+                const nonLolOtherTabs = otherTabs.filter(t => !t.name.includes('Change'));
                 if (nonLolOtherTabs.length === 0) {
-                    alert("すべてのタブを「変化」指定できません。最低でも１つのタブは別の名前にしてくださいね！");
+                    alert("You cannot name all tabs 'Change'. Please keep at least one tab with a different name!");
                     setEditingId(null);
                     return;
                 }
@@ -124,12 +124,12 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
                         [{tab.keybind}]
                     </span>
                     {tabs.length > 1 && (
-                        <button className="tab-delete" onClick={(e) => handleDelete(e, tab.id)} title="削除">×</button>
+                        <button className="tab-delete" onClick={(e) => handleDelete(e, tab.id)} title="Delete">×</button>
                     )}
                 </div>
             ))}
             {tabs.length < 8 && (
-                <button className="add-tab-btn" onClick={handleAdd} title="新しいタブを追加">+</button>
+                <button className="add-tab-btn" onClick={handleAdd} title="Add a new tab">+</button>
             )}
         </div>
     );

@@ -682,6 +682,7 @@ body {
 .bg-toggles {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .bg-toggle-btn {

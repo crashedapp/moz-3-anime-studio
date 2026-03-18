@@ -61,7 +61,7 @@ export default function Preview({ globalSettings, activeTabId, parts, transform,
                             transformOrigin: 'bottom center'
                         }}
                     >
-                        {/* 過去の表情（フェードアウト＆スライドアウト） */}
+                        {/* Previous Expression (Fade Out & Slide Out) */}
                         {crossfadeData && (
                             <>
                                 {crossfadeData.mouth && (
@@ -75,7 +75,7 @@ export default function Preview({ globalSettings, activeTabId, parts, transform,
                             </>
                         )}
 
-                        {/* 現在の表情（フェードイン＆スライドイン） */}
+                        {/* Current Expression (Fade In & Slide In) */}
                         {currentMouthKey && <img src={parts[currentMouthKey]} className={`avatar-layer ${isFading ? 'cf-fade-in' : ''}`} style={{ zIndex: 1, animationDuration: `${fadeSpeed}ms` }} alt="base/mouth" />}
                         <div style={{ zIndex: 3, position: 'absolute', width: '100%', height: '100%', transform: `translate(${transform.eyeX || 0}px, ${transform.eyeY || 0}px)` }}>
                             {parts[currentEye] && <img src={parts[currentEye]} className={`avatar-layer ${isFading ? 'cf-eye-slide-in' : ''}`} style={{ animationDuration: `${fadeSpeed}ms` }} alt="eye" />}
@@ -85,7 +85,7 @@ export default function Preview({ globalSettings, activeTabId, parts, transform,
             </div>
             {!isStreamMode && !isEditMode && (
                  <div style={{ position: 'absolute', bottom: '16px', right: '16px', background: 'rgba(0,0,0,0.5)', padding: '6px 12px', borderRadius: '4px', fontSize: '0.8rem', color: '#fff', pointerEvents: 'none', opacity: 0.6 }}>
-                     モデルをダブルクリックで変形・編集
+                     Double click the model to transform/edit
                  </div>
             )}
         </div>
