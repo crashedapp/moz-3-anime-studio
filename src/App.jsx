@@ -35,6 +35,31 @@ const handleWindowControl = (command) => {
   }
 };
 
+const handleHeaderMouseDown = (e) => {
+  // Only handle left-click drag, and not on interactive elements
+  if (e.button !== 0) return;
+  const tag = e.target.tagName;
+  if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if (e.target.closest('.expression-tabs, .window-controls, button, input')) return;
+
+  if (window.require) {
+    const { ipcRenderer } = window.require('electron');
+    const startX = e.screenX;
+    const startY = e.screenY;
+    ipcRenderer.send('window-drag-start');
+
+    const onMouseMove = (ev) => {
+      ipcRenderer.send('window-dragging', { deltaX: ev.screenX - startX, deltaY: ev.screenY - startY });
+    };
+    const onMouseUp = () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }
+};
+
 function App() {
   const [activeTabId, setActiveTabId] = useState('1');
   const [expressions, setExpressions] = useState([
@@ -502,7 +527,7 @@ function App() {
   return (
     <div className={`app-container ${isStreamMode ? 'stream-mode' : ''}`}>
       {!isStreamMode && (
-        <header className="header">
+        <header className="header" onMouseDown={handleHeaderMouseDown}>
           <div
             className="header-title-container"
             onClick={() => setIsAboutModalOpen(true)}

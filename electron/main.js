@@ -56,6 +56,19 @@ app.whenReady().then(async () => {
         if (command === 'close') win.close();
     });
 
+    // Manual window drag for transparent frameless windows (workaround for Electron bug on Windows)
+    let dragStartWinPos = null;
+    ipcMain.on('window-drag-start', (event) => {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win) dragStartWinPos = win.getPosition();
+    });
+    ipcMain.on('window-dragging', (event, { deltaX, deltaY }) => {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (win && dragStartWinPos) {
+            win.setPosition(dragStartWinPos[0] + deltaX, dragStartWinPos[1] + deltaY);
+        }
+    });
+
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
