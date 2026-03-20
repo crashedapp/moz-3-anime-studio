@@ -91,6 +91,7 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
     };
 
     const handleNameKeyDown = (e) => {
+        e.stopPropagation();
         if (e.key === 'Enter') {
             commitNameChange();
         } else if (e.key === 'Escape') {
