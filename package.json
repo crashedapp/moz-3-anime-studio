@@ -49,14 +49,6 @@
       "target": "nsis",
       "icon": "public/logo.png"
     },
-    "extraResources": [
-      {
-        "from": "public/BGM",
-        "to": "BGM",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ]
+    "extraResources": []
   }
 }

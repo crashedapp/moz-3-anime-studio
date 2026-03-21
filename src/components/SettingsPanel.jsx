@@ -4,8 +4,6 @@ export default function SettingsPanel({
     globalSettings, onGlobalSettingsChange,
     expSettings, onExpSettingsChange,
     audioAnalyzer,
-    bgmList, selectedBgm, onBgmChange,
-    isBgmPlaying, toggleBgmPlay, stopBgm,
     isStreamMode,
     onManualSave,
     onResetData
@@ -213,74 +211,6 @@ export default function SettingsPanel({
                         />
                     </div>
                 )}
-            </div>
-
-            <div className="setting-section glass-panel" style={{ padding: '16px' }}>
-                <h3>🎵 BGM Settings</h3>
-
-                <div style={{ marginBottom: '16px' }}>
-                    <div className="slider-header" style={{ marginBottom: '8px' }}>
-                        <span>Select BGM</span>
-                    </div>
-                    <select
-                        style={{ width: '100%', padding: '8px', background: 'var(--glass-bg)', color: 'var(--text-primary)', border: '1px solid var(--glass-border)', borderRadius: 'var(--radius-sm)', marginBottom: '12px' }}
-                        value={selectedBgm}
-                        onChange={(e) => onBgmChange(e.target.value)}
-                    >
-                        <option value="none">None</option>
-                        <option value="random">Random Playback</option>
-                        {bgmList.map((bgm, i) => (
-                            <option key={i} value={bgm}>{bgm}</option>
-                        ))}
-                    </select>
-
-                    <div className="bg-toggles">
-                        {isBgmPlaying ? (
-                            <button
-                                className="bg-toggle-btn active"
-                                onClick={toggleBgmPlay}
-                                disabled={selectedBgm === 'none'}
-                                style={{ opacity: selectedBgm === 'none' ? 0.5 : 1, cursor: selectedBgm === 'none' ? 'not-allowed' : 'pointer' }}
-                            >
-                                ⏸ Pause
-                            </button>
-                        ) : (
-                            <button
-                                className="bg-toggle-btn"
-                                onClick={toggleBgmPlay}
-                                disabled={selectedBgm === 'none'}
-                                style={{ opacity: selectedBgm === 'none' ? 0.5 : 1, cursor: selectedBgm === 'none' ? 'not-allowed' : 'pointer' }}
-                            >
-                                ▶ Play
-                            </button>
-                        )}
-                        <button
-                            className="bg-toggle-btn"
-                            onClick={stopBgm}
-                            disabled={selectedBgm === 'none'}
-                            style={{ opacity: selectedBgm === 'none' ? 0.5 : 1, cursor: selectedBgm === 'none' ? 'not-allowed' : 'pointer' }}
-                        >
-                            ⏹ Stop
-                        </button>
-                    </div>
-                    <div style={{ marginTop: '16px' }}>
-                        <div className="slider-header" style={{ marginBottom: '8px' }}>
-                            <span>Volume</span>
-                            <span>{globalSettings.bgmVolume ?? 50}%</span>
-                        </div>
-                        <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={globalSettings.bgmVolume ?? 50}
-                            onChange={(e) => updateGlobal('bgmVolume', parseInt(e.target.value, 10))}
-                            className="range-slider"
-                        />
-                    </div>
-                    <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '24px' }}>
-                        If you feel lonely without music, we recommend playing the preset BGM composed by Motaro
-                    </p>
-                </div>
             </div>
 
             {/* Save & Reset Settings */}

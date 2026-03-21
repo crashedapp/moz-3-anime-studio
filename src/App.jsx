@@ -114,7 +114,6 @@ function App() {
     silenceThreshold: 50,
     switchCooldown: 1.0,
     enableCooldown: true,
-    bgmVolume: 50,
     crossfade: true,
     crossfadeSpeed: 150
   });
@@ -125,138 +124,6 @@ function App() {
 
   const [hasLoadedData, setHasLoadedData] = useState(false);
   const [savedMicDeviceId, setSavedMicDeviceId] = useState('default');
-
-  // BGM State
-  const [bgmList, setBgmList] = useState([]);
-  const [selectedBgm, setSelectedBgm] = useState('none');
-  const [isBgmPlaying, setIsBgmPlaying] = useState(false);
-  const bgmAudioRef = useRef(null);
-  const selectedBgmRef = useRef('none');
-
-  useEffect(() => {
-    selectedBgmRef.current = selectedBgm;
-  }, [selectedBgm]);
-
-  // Load BGM list dynamically
-  useEffect(() => {
-    try {
-      const isElectron = !!(window && window.process && window.process.type);
-      if (isElectron) {
-        const fs = window.require('fs');
-        const path = window.require('path');
-        let bgmDir;
-        if (import.meta.env.DEV) {
-          bgmDir = path.join(process.cwd(), 'public', 'BGM');
-        } else {
-          const processEnv = window.require('process');
-          bgmDir = path.join(processEnv.resourcesPath, 'BGM');
-        }
-        if (fs.existsSync(bgmDir)) {
-          const files = fs.readdirSync(bgmDir);
-          const audioFiles = files.filter(f => /\.(mp3|wav|ogg|m4a)$/i.test(f));
-          setBgmList(audioFiles);
-        }
-      } else {
-        // Observer/Browser Env Fallback list
-        setBgmList([
-          "1.ナイトシティ・ステップ.mp3",
-          "2.右手にチキン、左手にソーダ.mp3",
-          "3.M-REMIX.mp3",
-          "4.ミックス・ピザ.mp3",
-          "5.モタロ・コンツェルト.mp3"
-        ]);
-      }
-    } catch (e) {
-      console.error("Failed to read BGM directory", e);
-    }
-  }, []);
-
-  const getBgmUrl = (filename) => {
-    const isElectron = !!(window && window.process && window.process.type);
-    if (!isElectron || import.meta.env.DEV) {
-      return `/BGM/${encodeURIComponent(filename)}`;
-    }
-    const path = window.require('path');
-    const processEnv = window.require('process');
-    const bgmDir = path.join(processEnv.resourcesPath, 'BGM');
-    return `file:///${bgmDir.replace(/\\/g, '/')}/${encodeURIComponent(filename)}`;
-  };
-
-  const playBgmTrack = (trackName) => {
-    if (bgmAudioRef.current) {
-      bgmAudioRef.current.pause();
-      bgmAudioRef.current = null;
-    }
-    if (trackName === 'none' || !trackName) return;
-
-    let targetTrack = trackName;
-    if (trackName === 'random') {
-      if (bgmList.length === 0) return;
-      const randomIndex = Math.floor(Math.random() * bgmList.length);
-      targetTrack = bgmList[randomIndex];
-    }
-
-    const url = getBgmUrl(targetTrack);
-    const audio = new Audio(url);
-    audio.volume = (globalSettings.bgmVolume ?? 50) / 100;
-
-    audio.addEventListener('ended', () => {
-      // Loop if a specific track is selected, or pick a new random track if random is selected
-      if (selectedBgmRef.current === 'random') {
-        playBgmTrack('random');
-      } else {
-        audio.currentTime = 0;
-        audio.play().catch(e => console.error(e));
-      }
-    });
-
-    audio.play().catch(e => {
-      console.error("BGM Playback failed:", e);
-      setIsBgmPlaying(false);
-    });
-
-    bgmAudioRef.current = audio;
-    setIsBgmPlaying(true);
-  };
-
-  useEffect(() => {
-    if (bgmAudioRef.current) {
-      bgmAudioRef.current.volume = (globalSettings.bgmVolume ?? 50) / 100;
-    }
-  }, [globalSettings.bgmVolume]);
-
-  const stopBgm = () => {
-    if (bgmAudioRef.current) {
-      bgmAudioRef.current.pause();
-      bgmAudioRef.current = null;
-    }
-    setIsBgmPlaying(false);
-    setSelectedBgm('none');
-  };
-
-  const toggleBgmPlay = () => {
-    if (selectedBgm === 'none') return;
-    if (isBgmPlaying) {
-      if (bgmAudioRef.current) bgmAudioRef.current.pause();
-      setIsBgmPlaying(false);
-    } else {
-      if (bgmAudioRef.current) {
-        bgmAudioRef.current.play().catch(e => console.error(e));
-        setIsBgmPlaying(true);
-      } else {
-        playBgmTrack(selectedBgm);
-      }
-    }
-  };
-
-  const handleBgmChange = (val) => {
-    setSelectedBgm(val);
-    if (val === 'none') {
-      stopBgm();
-    } else {
-      playBgmTrack(val);
-    }
-  };
 
   // Load data on mount
   useEffect(() => {
@@ -609,12 +476,6 @@ function App() {
             isStreamMode={isStreamMode}
             onManualSave={manualSave}
             onResetData={resetAllData}
-            bgmList={bgmList}
-            selectedBgm={selectedBgm}
-            onBgmChange={handleBgmChange}
-            isBgmPlaying={isBgmPlaying}
-            toggleBgmPlay={toggleBgmPlay}
-            stopBgm={stopBgm}
             />
           </>
         )}
