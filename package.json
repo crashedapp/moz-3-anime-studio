@@ -36,7 +36,7 @@
     "wait-on": "^9.0.4"
   },
   "build": {
-    "appId": "com.seven.antigravitylink",
+    "appId": "com.crashedapp.avatarian",
     "productName": "Avatarian",
     "electronDist": "node_modules/electron/dist",
     "directories": {

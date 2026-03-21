@@ -15,6 +15,7 @@ Added The following UI Items
 
 Avatarian Contains the following Changes From the Original.
 - **Text is now all in English - Translated from Japanese.
+- **Stream Deck Support added for switching Tabs See Documenation Below .
 - **There is no more auto-switching between tabs by the app as I found that not suitable for my purposes.
 - **Background Music Feature has been removed.
 - **Added the ability to place the character in a circular border with and optional background image.

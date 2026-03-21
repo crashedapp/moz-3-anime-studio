@@ -178,11 +178,10 @@ export default function CalibrationModal({
                 {/* ℹ️ Credit & Version Info */}
                 <hr style={{ border: 'none', borderTop: '1px solid var(--glass-border)', margin: '24px 0 16px', opacity: 0.5 }} />
                 <div style={{ textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-                    <div style={{ fontWeight: 'bold', color: 'var(--text-primary)', margin: '4px 0' }}>MOZ-3 Anime Studio</div>
-                    <div>Version: v1.0.0 Beta</div>
-                    <div>Creator: Motaro</div>
-                    <div>Character Design: Motaro</div>
-                    <div>BGM: Motaro</div>
+                    <div style={{ fontWeight: 'bold', color: 'var(--text-primary)', margin: '4px 0' }}>Avatarian</div>
+                    <div>Version: v1.0.0</div>
+                    <div>Original Creator: Motaro</div>
+                    <div>Original Character Design: Motaro</div>
                 </div>
             </div>
         </div>
