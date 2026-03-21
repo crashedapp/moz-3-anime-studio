@@ -1,10 +1,17 @@
-# MOZ-3 Anime Studio
+# MOZ-3 Anime Studio FORK
 
 MOZ-3 Anime Studio is an interactive, Electron and React-based vTuber/avatar studio application. It provides dynamic lip-sync capabilities, animated expressions, and audio analysis to bring 2D avatars to life for streaming or recording.
 
 This project is a fork. The original source code can be found here:
 
 https://github.com/motaro-aniki/moz-3-anime-studio
+
+
+![Forked Application Screenshot](screen_shot.png)
+
+Added The following UI Items
+
+![Forked Application Screenshot](screen_shot2.png)
 
 This Fork Contains the following Changes.
 - **Text is now all in English - Translated from Japanese.
