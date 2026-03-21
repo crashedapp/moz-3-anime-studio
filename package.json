@@ -38,6 +38,7 @@
   "build": {
     "appId": "com.seven.antigravitylink",
     "productName": "Avatarian",
+    "electronDist": "node_modules/electron/dist",
     "directories": {
       "output": "release"
     },
