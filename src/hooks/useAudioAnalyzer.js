@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import Meyda from 'meyda';
 
 export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal = null) {
     const { sensitivity, silenceThreshold, switchCooldown = 2.0, enableCooldown = true } = globalSettings;
@@ -8,8 +9,10 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
 
     const [isActive, setIsActiveState] = useState(false);
     const [level, setLevel] = useState(0); // 0-1
+    const [mouthOpenness, setMouthOpenness] = useState(0); // 0-1, Meyda-enhanced lip sync signal
     const [detectedTone, setDetectedTone] = useState(null); // 'laugh', 'silence', 'normal'
     const [pitch, setPitch] = useState(0);
+    const smoothedOpennessRef = useRef(0);
 
     // Audio File Elements
     const [audioFile, setAudioFile] = useState(null);
@@ -101,6 +104,8 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
             audioElemRef.current.addEventListener('ended', () => {
                 setIsPlayingFile(false);
                 setFileProgress(0);
+                smoothedOpennessRef.current = 0;
+                setMouthOpenness(0);
                 setDetectedTone(null);
             });
 
@@ -172,6 +177,8 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
             sourceRef.current = null;
         }
         setLevel(0);
+        smoothedOpennessRef.current = 0;
+        setMouthOpenness(0);
         setDetectedTone(null);
     };
 
@@ -234,6 +241,8 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         }
         setIsPlayingFile(false);
         setFileProgress(0);
+        smoothedOpennessRef.current = 0;
+        setMouthOpenness(0);
         setDetectedTone(null);
     };
 
@@ -282,6 +291,8 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
 
         if (!currentlyActive && !currentlyPlaying) {
             setLevel(0);
+            smoothedOpennessRef.current = 0;
+            setMouthOpenness(0);
             animationFrameRef.current = requestAnimationFrame(loop);
             return;
         }
@@ -289,6 +300,8 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         const activeAnalyser = currentlyActive ? micAnalyserRef.current : fileAnalyserRef.current;
         if (!activeAnalyser || (!currentlyActive && !currentlyPlaying)) {
             setLevel(0);
+            smoothedOpennessRef.current = 0;
+            setMouthOpenness(0);
             animationFrameRef.current = requestAnimationFrame(loop);
             return;
         }
@@ -307,6 +320,62 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         if (normalized > 1) normalized = 1;
 
         setLevel(normalized);
+
+        // --- Meyda Feature Extraction for Improved Lip Sync ---
+        const timeDomainData = new Float32Array(activeAnalyser.fftSize);
+        activeAnalyser.getFloatTimeDomainData(timeDomainData);
+
+        Meyda.bufferSize = activeAnalyser.fftSize;
+        Meyda.sampleRate = audioContextRef.current.sampleRate;
+
+        let meydaFeatures = null;
+        try {
+            meydaFeatures = Meyda.extract(['rms', 'spectralCentroid', 'spectralFlatness'], timeDomainData);
+        } catch (e) {
+            // Meyda can throw on edge cases (e.g. all-zero buffer)
+        }
+
+        let targetOpenness = 0;
+        if (meydaFeatures && meydaFeatures.rms != null) {
+            const rms = meydaFeatures.rms;
+
+            // Gate: ignore very quiet input (noise floor)
+            if (rms > 0.008) {
+                const sensMult = (sensitivity / 50) * 1.5;
+
+                // RMS for speech typically ranges 0.01-0.3, scale to 0-1
+                let baseOpenness = Math.min(rms * sensMult * 5.0, 1.0);
+                // Power curve: subtle at low end, dramatic at high end
+                baseOpenness = Math.pow(baseOpenness, 0.7);
+
+                // Spectral centroid vowel modifier
+                // Open vowels (ah, oh) have centroid ~400-1200Hz -> mouth opens more
+                // Closed sounds (ee, ss, ff) have centroid ~2000-5000Hz -> mouth opens less
+                const sRate = audioContextRef.current.sampleRate;
+                const centroidBin = meydaFeatures.spectralCentroid || 0;
+                const centroidHz = centroidBin * (sRate / activeAnalyser.fftSize);
+
+                let vowelMod = 1.0;
+                if (centroidHz > 200 && centroidHz < 8000) {
+                    const norm = Math.min(Math.max((centroidHz - 200) / 4000, 0), 1);
+                    vowelMod = 1.0 - (norm * 0.3); // Range: 0.7 to 1.0
+                }
+
+                // Noise rejection via spectral flatness (tonal speech ≈ 0, noise ≈ 1)
+                const flatness = meydaFeatures.spectralFlatness || 0;
+                const tonality = 1.0 - Math.min(flatness * 2.0, 0.5); // Range: 0.5 to 1.0
+
+                targetOpenness = Math.min(baseOpenness * vowelMod * tonality, 1.0);
+            }
+        }
+
+        // Asymmetric EMA: open mouth faster, close slower for natural feel
+        const prev = smoothedOpennessRef.current;
+        const alpha = targetOpenness > prev ? 0.45 : 0.12;
+        smoothedOpennessRef.current = prev + (targetOpenness - prev) * alpha;
+        if (smoothedOpennessRef.current < 0.005) smoothedOpennessRef.current = 0;
+
+        setMouthOpenness(smoothedOpennessRef.current);
 
         // --- Volume Envelope Analysis (Rhythm) ---
         recentVolumesRef.current.push(normalized);
@@ -459,7 +528,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
     }, [initialCalibratedNormal]);
 
     return {
-        isActive, toggleMic, level, pitch, detectedTone,
+        isActive, toggleMic, level, mouthOpenness, pitch, detectedTone,
         audioDevices, selectedDeviceId, changeDevice,
         calibrationPhase, startCalibration, resetCalibration,
         calibratedNormal,

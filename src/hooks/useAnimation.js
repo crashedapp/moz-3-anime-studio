@@ -70,15 +70,15 @@ export default function useAnimation(audioData, expSettings, activeMouthCount) {
             const currentAudioLevel = audioDataRef.current?.level || 0;
             const currentPitch = audioDataRef.current?.pitch || 300;
             const averagePitch = audioDataRef.current?.calibratedNormal || 300;
+            const mouthOpenness = audioDataRef.current?.mouthOpenness || 0;
             const { preset, idleAnim, breathSpeed } = expSettingsRef.current;
             const currentMouthCount = activeMouthCountRef.current;
 
-            // 1. Lip Sync Mapping
+            // 1. Lip Sync Mapping (uses Meyda-enhanced mouthOpenness)
             let mIndex = 0;
-            if (currentMouthCount > 1 && currentAudioLevel > 0.05) {
+            if (currentMouthCount > 1 && mouthOpenness > 0.01) {
                 const thresholds = currentMouthCount - 1;
-                const normalizedAudio = Math.min(Math.max((currentAudioLevel - 0.05) / 0.95, 0), 1);
-                mIndex = 1 + Math.floor(normalizedAudio * (thresholds - 0.001));
+                mIndex = 1 + Math.floor(Math.min(mouthOpenness, 0.999) * thresholds);
             }
             setMouthIndex(mIndex);
 
