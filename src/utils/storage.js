@@ -40,3 +40,20 @@ export const clearAppData = async () => {
         throw err;
     }
 };
+
+export const saveLastMicDevice = async (deviceId) => {
+    try {
+        await localforage.setItem('lastMicDeviceId', deviceId);
+    } catch (err) {
+        console.error('Error saving mic device:', err);
+    }
+};
+
+export const loadLastMicDevice = async () => {
+    try {
+        return await localforage.getItem('lastMicDeviceId');
+    } catch (err) {
+        console.error('Error loading mic device:', err);
+        return null;
+    }
+};

@@ -8,7 +8,7 @@ import AboutModal from './components/AboutModal';
 
 import useAudioAnalyzer from './hooks/useAudioAnalyzer';
 import useAnimation from './hooks/useAnimation';
-import { loadAppData, saveAppData, clearAppData } from './utils/storage';
+import { loadAppData, saveAppData, clearAppData, saveLastMicDevice, loadLastMicDevice } from './utils/storage';
 import debounce from 'lodash/debounce';
 
 export const DEFAULT_PARTS = {
@@ -113,6 +113,7 @@ function App() {
   const [isStreamMode, setIsStreamMode] = useState(false);
 
   const [hasLoadedData, setHasLoadedData] = useState(false);
+  const [savedMicDeviceId, setSavedMicDeviceId] = useState('default');
 
   // BGM State
   const [bgmList, setBgmList] = useState([]);
@@ -264,6 +265,8 @@ function App() {
           setGlobalSettings(prev => ({ ...prev, ...data.globalSettings, _initialCalibratedNormal: data.calibratedNormal }));
         }
       }
+      const lastMic = await loadLastMicDevice();
+      if (lastMic) setSavedMicDeviceId(lastMic);
       setHasLoadedData(true);
     };
     initData();
@@ -348,7 +351,11 @@ function App() {
   };
 
   // --- AUDIO & ANIMATION HOOKS ---
-  const audioAnalyzer = useAudioAnalyzer(globalSettings, hasLoadedData ? globalSettings._initialCalibratedNormal : null);
+  const audioAnalyzer = useAudioAnalyzer(
+    globalSettings,
+    hasLoadedData ? globalSettings._initialCalibratedNormal : null,
+    { initialDeviceId: savedMicDeviceId, onDeviceChange: saveLastMicDevice }
+  );
 
   // Create a stable debounced save function
   const debouncedSave = useMemo(() => debounce(async (data) => {

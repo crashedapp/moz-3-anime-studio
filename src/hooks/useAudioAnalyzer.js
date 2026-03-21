@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Meyda from 'meyda';
 
-export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal = null) {
+export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal = null, { initialDeviceId = 'default', onDeviceChange = null } = {}) {
     const { sensitivity, silenceThreshold, switchCooldown = 2.0, enableCooldown = true } = globalSettings;
     // Refs for states to ensure the loop closure always reads the latest values
     const isActiveRef = useRef(false);
@@ -40,7 +40,8 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
 
     // Device Selection
     const [audioDevices, setAudioDevices] = useState([]);
-    const [selectedDeviceId, setSelectedDeviceId] = useState('default');
+    const [selectedDeviceId, setSelectedDeviceId] = useState(initialDeviceId);
+    const hasAutoStartedRef = useRef(false);
 
     // Tone Detection specific Refs
     const silenceStartRef = useRef(null);
@@ -138,6 +139,23 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         return () => navigator.mediaDevices.removeEventListener('devicechange', getAudioDevices);
     }, []);
 
+    // Auto-start mic on mount once devices are enumerated
+    useEffect(() => {
+        if (hasAutoStartedRef.current || audioDevices.length === 0) return;
+        hasAutoStartedRef.current = true;
+
+        // If saved device is available, use it; otherwise fall back to default
+        let deviceToUse = 'default';
+        if (initialDeviceId && initialDeviceId !== 'default') {
+            const found = audioDevices.find(d => d.deviceId === initialDeviceId);
+            if (found) {
+                deviceToUse = initialDeviceId;
+            }
+        }
+        setSelectedDeviceId(deviceToUse);
+        startMicAnalysis(deviceToUse);
+    }, [audioDevices]);
+
     const startMicAnalysis = async (deviceId = selectedDeviceId) => {
         try {
             if (isPlayingFile) stopFile();
@@ -189,6 +207,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
 
     const changeDevice = (deviceId) => {
         setSelectedDeviceId(deviceId);
+        if (onDeviceChange) onDeviceChange(deviceId);
         if (isActive) {
             stopAnalysis();
             startMicAnalysis(deviceId);
