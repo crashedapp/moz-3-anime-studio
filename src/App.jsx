@@ -25,7 +25,18 @@ export const DEFAULT_EXP_SETTINGS = {
   preset: 'off',
   idleAnim: 'breathing',
   breathSpeed: 50,
-  transform: { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 }
+  transform: { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 },
+  backdrop: {
+    enabled: false,
+    diameter: 100,
+    borderThickness: 10,
+    borderColor: '#800080',
+    fillColor: '#ffffff',
+    offsetX: 0,
+    offsetY: 0,
+    bgImage: null,
+    bgImageEnabled: false
+  }
 };
 
 const handleWindowControl = (command) => {
@@ -575,6 +586,7 @@ function App() {
           isStreamMode={isStreamMode}
           layoutTransform={activeExpression.settings.transform || { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 }}
           onLayoutTransformChange={(t) => handleExpSettingsChange({ ...activeExpression.settings, transform: t })}
+          backdrop={activeExpression.settings.backdrop}
         />
         {!isStreamMode && (
           <>
@@ -583,6 +595,10 @@ function App() {
               onPartChange={handlePartChange} 
               tabName={activeExpression.name}
               onResetTransform={() => handleExpSettingsChange({ ...activeExpression.settings, transform: { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 } })}
+              backdrop={activeExpression.settings.backdrop}
+              onBackdropChange={(newBackdrop) => handleExpSettingsChange({ ...activeExpression.settings, backdrop: newBackdrop })}
+              layoutTransform={activeExpression.settings.transform || { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 }}
+              onLayoutTransformChange={(t) => handleExpSettingsChange({ ...activeExpression.settings, transform: t })}
             />
             <SettingsPanel
             globalSettings={globalSettings}
