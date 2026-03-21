@@ -34,8 +34,8 @@ export const DEFAULT_EXP_SETTINGS = {
     fillColor: '#ffffff',
     offsetX: 6,
     offsetY: 6,
-    bgImage: null,
-    bgImageEnabled: false
+    bgImage: './demo/default_demo/bg.png',
+    bgImageEnabled: true
   }
 };
 
@@ -44,17 +44,6 @@ const handleWindowControl = (command) => {
     const { ipcRenderer } = window.require('electron');
     ipcRenderer.send('window-control', command);
   }
-};
-
-const handleResizeStart = (direction) => {
-  if (!window.require) return;
-  const { ipcRenderer } = window.require('electron');
-  ipcRenderer.send('start-resize', direction);
-  const onMouseUp = () => {
-    ipcRenderer.send('stop-resize');
-    window.removeEventListener('mouseup', onMouseUp);
-  };
-  window.addEventListener('mouseup', onMouseUp);
 };
 
 const handleHeaderMouseDown = (e) => {
@@ -194,7 +183,7 @@ function App() {
         if (isStreamMode) {
           document.documentElement.classList.add('hide-cursor');
         }
-      }, 3000);
+      }, 1000);
     };
 
     if (isStreamMode) {
@@ -416,20 +405,6 @@ function App() {
         isOpen={isAboutModalOpen}
         onClose={() => setIsAboutModalOpen(false)}
       />
-
-      {/* Window resize edges for frameless transparent window */}
-      {!isStreamMode && (
-        <>
-          <div className="resize-edge resize-top" onMouseDown={() => handleResizeStart('top')} />
-          <div className="resize-edge resize-bottom" onMouseDown={() => handleResizeStart('bottom')} />
-          <div className="resize-edge resize-left" onMouseDown={() => handleResizeStart('left')} />
-          <div className="resize-edge resize-right" onMouseDown={() => handleResizeStart('right')} />
-          <div className="resize-edge resize-top-left" onMouseDown={() => handleResizeStart('top-left')} />
-          <div className="resize-edge resize-top-right" onMouseDown={() => handleResizeStart('top-right')} />
-          <div className="resize-edge resize-bottom-left" onMouseDown={() => handleResizeStart('bottom-left')} />
-          <div className="resize-edge resize-bottom-right" onMouseDown={() => handleResizeStart('bottom-right')} />
-        </>
-      )}
     </div>
   );
 }

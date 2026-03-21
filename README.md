@@ -12,13 +12,14 @@ This Fork Contains the following Changes.
 - **Background Music Feature has been removed.
 - **Added the ability to place the character in a circular border with and optional background image.
 - **Fixed Dragging of Window when not maximized on Windows. You can move by title bar though can be a bit finicky (Due to transparent window support)
-- **Fixed cannot resized non maximized window. Not normal resize but it works if you do it from the bootom or right edge (Due to transparent window support)
+- **Updated Electron to newest verson that fixes resizing of non maximized window (Due to transparent window support)
 - **Added ability to scale model image (including eyes).
 - **Removed support for dragging character in editor. Added x,y positional sliders instead as drag and drop was flakey.
 - **Redid positioning system to offest characters from the right panel so they maintain position when window is resized.
 - **Microphone will default to last one you seleted ( ie Nvidia Broadcast)
 - **Defaulted to Mic being active.
 - **Reworked lip-syncing to move mouth more accurately with sound.
+- **The exit stream mode hover button was taking a bit long to disappear so I decreased it to 1 second.
 
 
 
