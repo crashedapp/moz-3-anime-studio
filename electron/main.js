@@ -4,11 +4,11 @@ import path from 'path';
 
 
 const isDev = !app.isPackaged;
-app.setName('MOZ-3 Anime Studio');
+app.setName('Avatarian');
 
 function createWindow() {
     const win = new BrowserWindow({
-        title: 'MOZ-3 Anime Studio',
+        title: 'Avatarian',
         width: 1200,
         height: 800,
         minWidth: 800,

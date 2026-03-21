@@ -39,20 +39,15 @@ export default function AboutModal({ isOpen, onClose }) {
                     // --- Terms of Service View ---
                     <div style={{ textAlign: 'left', color: 'var(--text-secondary)' }}>
                         <h3 style={{ marginBottom: '24px', fontSize: '1.2rem', color: 'var(--accent-color)', textAlign: 'center' }}>
-                            📘 "MOZ-3 Anime Studio" Terms of Service
+                            📘 "Avatarian" Terms of Service
                         </h3>
 
                         <div style={{ fontSize: '0.85rem', lineHeight: '1.8', maxHeight: '60vh', overflowY: 'auto', paddingRight: '8px' }}>
                             <p style={{ marginBottom: '16px' }}>
-                                These terms establish the conditions of use for "MOZ-3 Anime Studio" (hereinafter referred to as "this app") provided by the creator, Motaro.
+                                These terms establish the conditions of use for "Avatarian" (hereinafter referred to as "this app") provided by the creator, Motaro.
                             </p>
 
-                            <h4 style={{ color: 'var(--text-primary)', marginTop: '20px', marginBottom: '8px' }}>1. Ownership of Rights</h4>
-                            <p style={{ marginBottom: '16px' }}>
-                                The creator, Motaro, retains copyrights and all other intellectual property rights to all programs, designs, BGM, and characters included in this app.<br />
-                                You are free to use stream screens and video content generated using this app for both commercial and non-commercial purposes.
-                            </p>
-
+                            
                             <h4 style={{ color: 'var(--text-primary)', marginTop: '20px', marginBottom: '8px' }}>2. Prohibited Actions</h4>
                             <p style={{ marginBottom: '16px' }}>
                                 Modification, analysis (reverse engineering), and secondary distribution of the programs and data of this app are strictly prohibited.<br />
@@ -86,22 +81,16 @@ export default function AboutModal({ isOpen, onClose }) {
                             About this app
                         </h3>
 
-                        <div style={{ marginBottom: '24px' }}>
-                            <img
-                                src="./motako.png"
-                                alt="Motako"
-                                style={{ width: '200px', height: 'auto', borderRadius: '8px', boxShadow: '0 4px 12px rgba(0,0,0,0.5)' }}
-                            />
-                        </div>
+                        
 
                         <div style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: '1.8', marginBottom: '32px' }}>
                             <div style={{ fontWeight: 'bold', color: 'var(--text-primary)', marginBottom: '8px', fontSize: '1rem' }}>
-                                MOZ-3 Anime Studio
+                                Avatarian A Fork Of MOZ-3 Anime Studio
                             </div>
-                            <div>Version: v1.0.0 Beta</div>
-                            <div>Creator: Motaro</div>
-                            <div>Character Design: Motaro</div>
-                            <div>BGM: Motaro</div>
+                            <div>Version: v1.0.0</div>
+                            <div>Original Creator: Motaro</div>
+                            <div>Original Character Design: Motaro</div>
+                            
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
@@ -109,7 +98,7 @@ export default function AboutModal({ isOpen, onClose }) {
                                 onClick={handleYoutubeClick}
                                 style={{ background: '#ff0000', color: 'white', padding: '10px 24px', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', width: '80%' }}
                             >
-                                ▶ Official YouTube Channel
+                                ▶ Original Creator's Official YouTube Channel
                             </button>
 
                             <button

@@ -316,7 +316,7 @@ function App() {
             title="About this app"
           >
             <img src="./logo.png" alt="Logo" className="header-logo" />
-            <div className="header-title">MOZ-3 Anime Studio</div>
+            <div className="header-title">Avatarian</div>
           </div>
           <ExpressionTabs
             tabs={expressions}

@@ -1,19 +1,19 @@
-# MOZ-3 Anime Studio FORK
+# Avatarian  A MOZ-3 Anime Studio FORK
 
-MOZ-3 Anime Studio is an interactive, Electron and React-based vTuber/avatar studio application. It provides dynamic lip-sync capabilities, animated expressions, and audio analysis to bring 2D avatars to life for streaming or recording.
+Avatarian is an interactive, Electron and React-based vTuber/avatar studio application. It provides dynamic lip-sync capabilities, animated expressions, and audio analysis to bring 2D avatars to life for streaming or recording.
 
 This project is a fork. The original source code can be found here:
 
 https://github.com/motaro-aniki/moz-3-anime-studio
 
 
-![Forked Application Screenshot](screen_shot.png)
+![Avatarian Application Screenshot](screen_shot.png)
 
 Added The following UI Items
 
-![Forked Application Screenshot](screen_shot2.png)
+![Avatarian Application Screenshot](screen_shot2.png)
 
-This Fork Contains the following Changes.
+Avatarian Contains the following Changes From the Original.
 - **Text is now all in English - Translated from Japanese.
 - **There is no more auto-switching between tabs by the app as I found that not suitable for my purposes.
 - **Background Music Feature has been removed.
@@ -38,6 +38,7 @@ Motaro sensei
 
 https://www.youtube.com/channel/UCKetWmeZ8I95zejbTxiNg9Q
 
+A big thank you to Motaro!
 
 I found out about this project from here and originally just wanted to translate to English (I have done a lot more!).
 
@@ -93,6 +94,7 @@ npm run build
 
 
 ## License
+Same license as original code.
 This project is a fork of moz-3-anime-studio, see original repository for licensing.
 
 https://github.com/motaro-aniki/moz-3-anime-studio.
