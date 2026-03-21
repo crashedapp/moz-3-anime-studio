@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import Meyda from 'meyda';
 
 export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal = null, { initialDeviceId = 'default', onDeviceChange = null } = {}) {
-    const { sensitivity, silenceThreshold, switchCooldown = 2.0, enableCooldown = true } = globalSettings;
+    const { sensitivity } = globalSettings;
     // Refs for states to ensure the loop closure always reads the latest values
     const isActiveRef = useRef(false);
     const isPlayingFileRef = useRef(false);
@@ -10,7 +10,6 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
     const [isActive, setIsActiveState] = useState(false);
     const [level, setLevel] = useState(0); // 0-1
     const [mouthOpenness, setMouthOpenness] = useState(0); // 0-1, Meyda-enhanced lip sync signal
-    const [detectedTone, setDetectedTone] = useState(null); // 'laugh', 'silence', 'normal'
     const [pitch, setPitch] = useState(0);
     const smoothedOpennessRef = useRef(0);
 
@@ -43,26 +42,13 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
     const [selectedDeviceId, setSelectedDeviceId] = useState(initialDeviceId);
     const hasAutoStartedRef = useRef(false);
 
-    // Tone Detection specific Refs
-    const silenceStartRef = useRef(null);
-
-    // --- Advanced Auto-Switch (Laugh Calibration Logic) ---
-    // User_Pitch_Normal
+    // --- Calibration Logic ---
     const [calibratedNormal, setCalibratedNormal] = useState(initialCalibratedNormal || 300);
 
     const [calibrationPhase, setCalibrationPhase] = useState('idle'); // 'idle', 'normal'
     const tempPitchesRef = useRef([]);
 
-    // Hysteresis (Buffer): Require a tone to be detected continuously before switching
-    const toneBufferQueueRef = useRef([]);
-    const REQUIRED_FRAMES_FOR_SWITCH = 8; // ~130ms at 60fps
-
-    // Stabilization Logic (Cooldown & Smoothing)
-    const isLockedRef = useRef(false);
-    const lockTimerRef = useRef(null);
-    const currentToneRef = useRef(null);
     const recentPitchesRef = useRef([]); // for pitch moving average
-    const recentVolumesRef = useRef([]); // for envelope (laugh rhythm) detection
 
     const startCalibration = (phase) => {
         setCalibrationPhase(phase);
@@ -107,7 +93,6 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
                 setFileProgress(0);
                 smoothedOpennessRef.current = 0;
                 setMouthOpenness(0);
-                setDetectedTone(null);
             });
 
             fileSourceRef.current = audioContextRef.current.createMediaElementSource(audioElemRef.current);
@@ -170,13 +155,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
             sourceRef.current.connect(micAnalyserRef.current);
 
             setIsActive(true);
-            setDetectedTone(null);
-            toneBufferQueueRef.current = [];
-            currentToneRef.current = null;
-            isLockedRef.current = false;
-            if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
             recentPitchesRef.current = [];
-            recentVolumesRef.current = [];
         } catch (err) {
             console.error("Microphone access denied or error: ", err);
             setIsActive(false);
@@ -197,7 +176,6 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         setLevel(0);
         smoothedOpennessRef.current = 0;
         setMouthOpenness(0);
-        setDetectedTone(null);
     };
 
     const toggleMic = () => {
@@ -239,13 +217,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         }
         audioElemRef.current.play();
         setIsPlayingFile(true);
-        setDetectedTone(null);
-        toneBufferQueueRef.current = [];
-        currentToneRef.current = null;
-        isLockedRef.current = false;
-        if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
         recentPitchesRef.current = [];
-        recentVolumesRef.current = [];
     };
 
     const pauseFile = () => {
@@ -262,45 +234,12 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         setFileProgress(0);
         smoothedOpennessRef.current = 0;
         setMouthOpenness(0);
-        setDetectedTone(null);
     };
 
     const seekFile = (percentage) => {
         setFileProgress(percentage);
         if (audioElemRef.current && audioElemRef.current.duration) {
             audioElemRef.current.currentTime = (percentage / 100) * audioElemRef.current.duration;
-        }
-    };
-
-    // Helper to push to buffer and commit state if stable
-    const commitToneWithBuffer = (rawTone) => {
-        const queue = toneBufferQueueRef.current;
-        queue.push(rawTone);
-        if (queue.length > REQUIRED_FRAMES_FOR_SWITCH) {
-            queue.shift();
-        }
-
-        // Delay / Hysteresis: only switch if this tone has been sustained
-        const recentToneCount = queue.filter(t => t === rawTone).length;
-        if (queue.length === REQUIRED_FRAMES_FOR_SWITCH && recentToneCount >= 5) {
-            // Expression Switch Stabilization Logic (Gate Node & Timer Node equivalent)
-            if (!isLockedRef.current) {
-                if (currentToneRef.current !== rawTone || rawTone === 'laugh') {
-                    // Update Current Expression
-                    currentToneRef.current = rawTone;
-                    setDetectedTone({ tone: rawTone, id: Date.now() });
-
-                    // Lock the switch for Cooldown_Time if enabled
-                    if (enableCooldown !== false && switchCooldown > 0) {
-                        isLockedRef.current = true;
-                        if (lockTimerRef.current) clearTimeout(lockTimerRef.current);
-
-                        lockTimerRef.current = setTimeout(() => {
-                            isLockedRef.current = false;
-                        }, switchCooldown * 1000); // converting seconds to ms
-                    }
-                }
-            }
         }
     };
 
@@ -396,129 +335,43 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
 
         setMouthOpenness(smoothedOpennessRef.current);
 
-        // --- Volume Envelope Analysis (Rhythm) ---
-        recentVolumesRef.current.push(normalized);
-        if (recentVolumesRef.current.length > 15) { // Track last ~250ms at 60fps
-            recentVolumesRef.current.shift();
+        // --- Pitch Analysis ---
+        const sampleRate = audioContextRef.current.sampleRate;
+        const binSize = sampleRate / activeAnalyser.fftSize;
+
+        let maxVal = -1;
+        let maxIndex = -1;
+        const startBin = Math.floor(50 / binSize);
+        const endBin = Math.floor(1500 / binSize);
+
+        for (let i = startBin; i < endBin && i < dataArray.length; i++) {
+            if (dataArray[i] > maxVal) {
+                maxVal = dataArray[i];
+                maxIndex = i;
+            }
         }
 
-        const volHistory = recentVolumesRef.current;
-        const maxVol = Math.max(...volHistory);
-        const minVol = Math.min(...volHistory);
-        const volVariance = maxVol - minVol;
+        const peakFreq = maxIndex * binSize;
 
-        // --- Silence Detection ---
-        // RMS Node threshold logic
-        const silenceDurSeconds = 0.5 + (silenceThreshold / 100) * 9.5;
-        const silenceMaxVol = 0.05;
-
-        if (normalized <= silenceMaxVol) {
-            setPitch(calibratedNormal);
-            if (silenceStartRef.current === null) {
-                silenceStartRef.current = time;
-            } else {
-                const currentSilenceDur = (time - silenceStartRef.current) / 1000;
-                if (currentSilenceDur >= silenceDurSeconds) {
-                    commitToneWithBuffer('silence');
-                } else {
-                    commitToneWithBuffer('normal');
-                }
+        // --- Pitch Smoothing (Moving Average) ---
+        let smoothedPitch = peakFreq;
+        if (normalized > 0.05 && peakFreq > 50) {
+            recentPitchesRef.current.push(peakFreq);
+            if (recentPitchesRef.current.length > 5) { // Average over ~100ms
+                recentPitchesRef.current.shift();
             }
         } else {
-            // Reset signal (voice detected)
-            silenceStartRef.current = null;
+            recentPitchesRef.current = [];
+        }
 
-            // --- Pitch Analysis ---
-            const sampleRate = audioContextRef.current.sampleRate;
-            const binSize = sampleRate / activeAnalyser.fftSize;
+        if (recentPitchesRef.current.length > 0) {
+            smoothedPitch = recentPitchesRef.current.reduce((a, b) => a + b, 0) / recentPitchesRef.current.length;
+        }
+        setPitch(smoothedPitch);
 
-            let maxVal = -1;
-            let maxIndex = -1;
-            const startBin = Math.floor(50 / binSize);
-            const endBin = Math.floor(1500 / binSize);
-
-            for (let i = startBin; i < endBin && i < dataArray.length; i++) {
-                if (dataArray[i] > maxVal) {
-                    maxVal = dataArray[i];
-                    maxIndex = i;
-                }
-            }
-
-            const peakFreq = maxIndex * binSize;
-
-            // --- Pitch Smoothing (Moving Average) ---
-            let smoothedPitch = peakFreq;
-            if (normalized > 0.05 && peakFreq > 50) {
-                recentPitchesRef.current.push(peakFreq);
-                if (recentPitchesRef.current.length > 5) { // Average over ~100ms
-                    recentPitchesRef.current.shift();
-                }
-            } else {
-                recentPitchesRef.current = [];
-            }
-
-            if (recentPitchesRef.current.length > 0) {
-                smoothedPitch = recentPitchesRef.current.reduce((a, b) => a + b, 0) / recentPitchesRef.current.length;
-            }
-            setPitch(smoothedPitch);
-
-            // --- Learning Calibration Phase ---
-            if (calibrationPhase !== 'idle' && normalized > 0.1 && smoothedPitch > 50) {
-                tempPitchesRef.current.push(smoothedPitch);
-            }
-
-            // --- Laugh Detection Math ---
-            // Condition 1: Peak volume recently was high (absorbs dips in 'ha-ha' rhythm)
-            const isLoud = maxVol > 0.30;
-            // Condition 2: Pitch is slightly higher than baseline, OR it's a very loud laugh burst
-            const isHighPitch = smoothedPitch > (calibratedNormal * 1.15) || maxVol > 0.60;
-            // Condition 3: Envelope fluctuates rapidly (rhythm of laugh)
-            const hasRhythm = volVariance > 0.08;
-
-            // Anti-False-Positive Filters (Click / Keyboard rejection)
-            let lowEnergy = 0;
-            let highEnergy = 0;
-            let lowBinsCount = 0;
-            let highBinsCount = 0;
-            const midBin = Math.floor(1500 / binSize); // 1.5kHz upper end of strong voice fundamentals
-            const highBin = Math.floor(6000 / binSize); // Ignore ultra-high ambient hiss
-            
-            for (let i = startBin; i < highBin && i < dataArray.length; i++) {
-                if (i < midBin) {
-                    lowEnergy += dataArray[i];
-                    lowBinsCount++;
-                } else {
-                    highEnergy += dataArray[i];
-                    highBinsCount++;
-                }
-            }
-            const avgLow = lowBinsCount > 0 ? (lowEnergy / lowBinsCount) : 0;
-            const avgHigh = highBinsCount > 0 ? (highEnergy / highBinsCount) : 0;
-
-            // Vocal sounds (vowels) concentrate energy massively below 1.5kHz.
-            // Sharp transients (keyboard clicks) are broadband noise where avgLow ≈ avgHigh.
-            const isVoiceLike = avgLow > (avgHigh * 1.5);
-
-            // Transient Attack (Click) Rejection
-            // A sharp click/keyboard hit causes the volume to spike instantly.
-            // Vocal cords require time to ramp up (attack time).
-            let maxAttackSlope = 0;
-            for (let i = 1; i < volHistory.length; i++) {
-                const diff = volHistory[i] - volHistory[i-1];
-                if (diff > maxAttackSlope) maxAttackSlope = diff;
-            }
-            const isNotClick = maxAttackSlope < 0.45; // Reject instant 45%+ jumps in a single 16ms frame
-
-            // A laugh should be sustained longer than a single mechanical click or lip smack
-            const framesAboveThreshold = volHistory.filter(v => v > 0.10).length;
-            const isSustained = framesAboveThreshold >= 6; // At least ~100ms of decent volume
-
-            // Gate Node / Switch Logic
-            if (globalSettings.autoLaugh && isLoud && isHighPitch && hasRhythm && isVoiceLike && isSustained && isNotClick) {
-                commitToneWithBuffer('laugh');
-            } else {
-                commitToneWithBuffer('normal');
-            }
+        // --- Learning Calibration Phase ---
+        if (calibrationPhase !== 'idle' && normalized > 0.1 && smoothedPitch > 50) {
+            tempPitchesRef.current.push(smoothedPitch);
         }
 
         animationFrameRef.current = requestAnimationFrame(loop);
@@ -529,7 +382,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
         return () => {
             if (animationFrameRef.current) cancelAnimationFrame(animationFrameRef.current);
         };
-    }, [isActive, isPlayingFile, sensitivity, silenceThreshold, switchCooldown, calibrationPhase, calibratedNormal, globalSettings.autoLaugh, globalSettings.autoSilence, selectedDeviceId]);
+    }, [isActive, isPlayingFile, sensitivity, calibrationPhase, calibratedNormal, selectedDeviceId]);
 
     useEffect(() => {
         return () => {
@@ -547,7 +400,7 @@ export default function useAudioAnalyzer(globalSettings, initialCalibratedNormal
     }, [initialCalibratedNormal]);
 
     return {
-        isActive, toggleMic, level, mouthOpenness, pitch, detectedTone,
+        isActive, toggleMic, level, mouthOpenness, pitch,
         audioDevices, selectedDeviceId, changeDevice,
         calibrationPhase, startCalibration, resetCalibration,
         calibratedNormal,

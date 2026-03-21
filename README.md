@@ -6,6 +6,22 @@ This project is a fork. The original source code can be found here:
 
 https://github.com/motaro-aniki/moz-3-anime-studio
 
+This Fork Contains the following Changes.
+- **Text is now all in English - Translated from Japanese.
+- **There is no more auto-switching between tabs by the app as I found that not suitable for my purposes.
+- **Background Music Feature has been removed.
+- **Added the ability to place the character in a circular border with and optional background image.
+- **Fixed Dragging of Window when not maximized on Windows.
+- **Added ability to scale model image (including eyes).
+- **Removed support for dragging character in editor. Added x,y positional sliders instead as drag and drop was flakey.
+- **Redid positioning system to offest characters from the right panel so they maintain position when window is resized.
+- **Microphone will default to last one you seleted ( ie Nvidia Broadcast)
+- **Defaulted to Mic being active.
+- **Reworked lip-syncing to move mouth more accurately with sound.
+
+
+
+
 The Creator's Youtube Channel is here:
 
 
@@ -14,7 +30,7 @@ Motaro sensei
 https://www.youtube.com/channel/UCKetWmeZ8I95zejbTxiNg9Q
 
 
-I found out about this project from here and just wanted to translate to English.
+I found out about this project from here and originally just wanted to translate to English (I have done a lot more!).
 
 https://www.youtube.com/watch?v=48kUGGBYD2I
 
@@ -24,7 +40,6 @@ https://www.youtube.com/watch?v=48kUGGBYD2I
 - **Microphone Lip-Sync:** Real-time audio analysis automatically triggers lip-sync and expressions based on your microphone input.
 - **Audio File Lip-Sync:** Load custom audio files and have your avatar automatically lip-sync to the playback.
 - **Background Support:** Toggle between Transparent, Green, Blue, and Magenta backgrounds for easy chroma-keying in OBS or other broadcasting software.
-- **BGM Support:** Play background music (looped or random) directly from the application.
 - **Transform Controls:** Adjust the position, scale, and rotation of individual avatar parts.
 - **Calibration:** Calibrate microphone sensitivity and audio thresholds for an accurate lip-sync and tone-detection response.
 
@@ -55,8 +70,8 @@ npm run build
 ## How to Use
 
 1. **Adding Your Avatar:**
-   - Use the **Slot Panel** to upload or assign different image parts (e.g., base, eyes, mouth) to your character.
-   - Configure **Expressions** via the Expression Tabs to create varied looks (e.g., normal, laughing, silent).
+   - Use the **Assemble Model Assets Panel** to upload or assign different image parts (e.g., base, eyes, mouth) to your character.
+   - Configure different **Characters** or **Expressions** by adding new tabs. (e.g., talking, laughing, sleeping).
 
 2. **Audio & Lip-Sync:**
    - Navigate to the **Settings Panel** to select your audio input device.
@@ -67,9 +82,6 @@ npm run build
    - In the Settings Panel, find the **Background Color** section.
    - Select Green, Blue, or Magenta to use chroma key filters in your streaming software (like OBS Studio). Choose Transparent if your capture setup supports an alpha channel directly.
 
-4. **Background Music (BGM):**
-   - Place your music tracks inside the `public/BGM/` directory.
-   - Within the application's Settings Panel, select a track or choose "Random Playback" to set the perfect mood.
 
 ## License
 This project is a fork of moz-3-anime-studio, see original repository for licensing.

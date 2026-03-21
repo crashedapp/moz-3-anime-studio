@@ -25,15 +25,15 @@ export const DEFAULT_EXP_SETTINGS = {
   preset: 'off',
   idleAnim: 'breathing',
   breathSpeed: 50,
-  transform: { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 },
+  transform: { x: 22, y: 0, scaleX: 1, scaleY: 1, rotation: 0 },
   backdrop: {
-    enabled: false,
-    diameter: 100,
+    enabled: true,
+    diameter: 555,
     borderThickness: 10,
-    borderColor: '#800080',
+    borderColor: '#000000',
     fillColor: '#ffffff',
-    offsetX: 0,
-    offsetY: 0,
+    offsetX: 6,
+    offsetY: 6,
     bgImage: null,
     bgImageEnabled: false
   }
@@ -76,7 +76,7 @@ function App() {
   const [expressions, setExpressions] = useState([
     {
       id: '1',
-      name: 'Default (Demo)',
+      name: 'Talk (Demo)',
       keybind: '1',
       parts: {
         ...DEFAULT_PARTS,
@@ -92,14 +92,14 @@ function App() {
     },
     {
       id: '2',
-      name: 'Change (Demo)',
+      name: 'Laugh (Demo)',
       keybind: '2',
       parts: { ...DEFAULT_PARTS, mouth0: './demo/lol_demo/base/laugh.png' },
       settings: { ...DEFAULT_EXP_SETTINGS, preset: 'nigiyaka' }
     },
     {
       id: '3',
-      name: 'Silence (Demo)',
+      name: 'Sleep (Demo)',
       keybind: '3',
       parts: { ...DEFAULT_PARTS, mouth0: './demo/silence_demo/base/sleep.png' },
       settings: { ...DEFAULT_EXP_SETTINGS }
@@ -109,11 +109,6 @@ function App() {
   const [globalSettings, setGlobalSettings] = useState({
     sensitivity: 50,
     bgColor: 'transparent',
-    autoLaugh: true,
-    autoSilence: true,
-    silenceThreshold: 50,
-    switchCooldown: 1.0,
-    enableCooldown: true,
     crossfade: true,
     crossfadeSpeed: 150
   });
@@ -296,105 +291,6 @@ function App() {
       window.removeEventListener('beforeunload', handleBeforeUnload);
     };
   }, [expressions, globalSettings, audioAnalyzer.calibratedNormal, hasLoadedData, debouncedSave]);
-
-  // --- AUTO SWITCH LOGIC ---
-  const lastManualTabRef = useRef(activeTabId);
-  const lastProcessedToneRef = useRef(null);
-
-  useEffect(() => {
-    // If not actively auto-switched by a tone, record the user's manual choice
-    const toneData = audioAnalyzer.detectedTone;
-    const tone = toneData ? (toneData.tone || toneData) : null;
-
-    if (!tone || tone === 'normal') {
-      const currentName = expressions.find(e => e.id === activeTabId)?.name || '';
-      if (!currentName.includes('Change') && !currentName.startsWith('Silence')) {
-        lastManualTabRef.current = activeTabId;
-      }
-    } else {
-      // If we ARE auto-switched, but activeTabId is clearly a manual tab 
-      // (because the user clicked it while laughing/silent), update it anyway.
-      const currentName = expressions.find(e => e.id === activeTabId)?.name || '';
-      if (!currentName.includes('Change') && !currentName.startsWith('Silence')) {
-        lastManualTabRef.current = activeTabId;
-      }
-    }
-  }, [activeTabId, audioAnalyzer.detectedTone, expressions]);
-
-  useEffect(() => {
-    const toneData = audioAnalyzer.detectedTone;
-    if (!toneData) return;
-
-    const tone = toneData.tone || toneData;
-    const toneId = toneData.id || toneData;
-
-    // Prevent infinite loop from state change triggering re-eval
-    if (lastProcessedToneRef.current === toneId) {
-      return;
-    }
-
-    let targetTabId = null;
-
-    // Laugh: Random LOL Tab Selection
-    if (tone === 'laugh' && globalSettings.autoLaugh) {
-      const lolTabs = expressions.filter(exp => exp.name.includes('Change'));
-      if (lolTabs.length > 0) {
-        const nonLolTabs = expressions.filter(exp => !exp.name.includes('Change'));
-        // Safety check: Only auto-switch if there is at least 1 non-LOL tab
-        if (nonLolTabs.length >= 1) {
-          let availableLolTabs = lolTabs;
-          // If there are multiple LOL tabs, avoid the currently active one
-          if (lolTabs.length >= 2 && activeTabId) {
-            availableLolTabs = lolTabs.filter(t => t.id !== activeTabId);
-          }
-          const randomIndex = Math.floor(Math.random() * availableLolTabs.length);
-          targetTabId = availableLolTabs[randomIndex].id;
-        }
-      }
-    }
-
-    // Silence: Random Silence Tab Selection
-    if (tone === 'silence' && globalSettings.autoSilence) {
-      const silenceTabs = expressions.filter(exp => exp.name.startsWith('Silence'));
-      if (silenceTabs.length > 0) {
-        const nonAutoTabs = expressions.filter(exp => !exp.name.startsWith('Silence') && !exp.name.includes('Change'));
-        // Safety check: Only auto-switch if there is at least 1 normal tab
-        if (nonAutoTabs.length >= 1) {
-          // If already on a silence tab, STAY on it. Don't re-randomize while still silent.
-          const currentTab = expressions.find(exp => exp.id === activeTabId);
-          if (currentTab && currentTab.name.startsWith('Silence')) {
-            targetTabId = activeTabId;
-          } else {
-            const randomIndex = Math.floor(Math.random() * silenceTabs.length);
-            targetTabId = silenceTabs[randomIndex].id;
-          }
-        }
-      }
-    }
-
-    if (targetTabId) {
-      if (activeTabId !== targetTabId) {
-        setActiveTabId(targetTabId);
-      }
-    } else {
-      // Revert back if we are currently on an auto-switch tab and the tone ended
-      const currentTabName = expressions.find(exp => exp.id === activeTabId)?.name || '';
-      if (currentTabName.includes('Change') || currentTabName.startsWith('Silence')) {
-        // Check if the tab we want to return to still exists
-        const manualTabExists = expressions.find(exp => exp.id === lastManualTabRef.current);
-        if (manualTabExists) {
-          setActiveTabId(lastManualTabRef.current);
-        } else {
-          // Fallback to the very first non-LOL/non-silence tab if the last manual tab is gone
-          const firstManual = expressions.find(exp => !exp.name.includes('Change') && !exp.name.startsWith('Silence'));
-          if (firstManual) setActiveTabId(firstManual.id);
-          else setActiveTabId(expressions[0].id);
-        }
-      }
-    }
-
-    lastProcessedToneRef.current = toneId;
-  }, [audioAnalyzer.detectedTone, globalSettings.autoLaugh, globalSettings.autoSilence, expressions, activeTabId]);
 
   const mouthKeys = ['mouth0', 'mouth1', 'mouth2', 'mouth3'];
   const activeMouths = mouthKeys.filter(k => activeExpression.parts[k] !== null);

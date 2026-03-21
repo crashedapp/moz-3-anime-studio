@@ -14,8 +14,6 @@ export default function CalibrationModal({
         onGlobalSettingsChange({ ...globalSettings, [key]: value });
     };
 
-    const silenceSeconds = (0.5 + (globalSettings.silenceThreshold / 100) * 9.5).toFixed(1);
-
     const {
         calibrationPhase, startCalibration, resetCalibration,
         calibratedNormal,
@@ -120,7 +118,7 @@ export default function CalibrationModal({
                     {/* Expression Crossfade Settings */}
                     <div style={{ padding: '16px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', marginBottom: '16px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={{ fontWeight: 'bold', color: 'white' }}>Expression Transition Smoothing</span>
+                            <span style={{ fontWeight: 'bold', color: 'white' }}>Tab Switch Smoothing</span>
                             <button
                                 className={`bg-toggle-btn ${globalSettings.crossfade ? 'active' : ''}`}
                                 onClick={() => updateGlobal('crossfade', !globalSettings.crossfade)}
@@ -145,83 +143,6 @@ export default function CalibrationModal({
                             onChange={(e) => updateGlobal('crossfadeSpeed', parseInt(e.target.value, 10))}
                             className="range-slider"
                             style={{ marginTop: '8px' }}
-                        />
-                    </div>
-
-                    {/* Laugh Settings */}
-                    <div style={{ marginBottom: '16px', padding: '16px', background: 'rgba(245, 158, 11, 0.1)', borderRadius: '8px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontWeight: 'bold', color: '#fbbf24' }}>Pitch Sensor</span>
-                            <button
-                                className={`bg-toggle-btn ${globalSettings.autoLaugh ? 'active' : ''}`}
-                                onClick={() => updateGlobal('autoLaugh', !globalSettings.autoLaugh)}
-                                style={{ margin: 0 }}
-                            >
-                                {globalSettings.autoLaugh ? 'ON' : 'OFF'}
-                            </button>
-                        </div>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '12px' }}>
-                            If ON, an increase in pitch will automatically trigger tabs with "Change" in their name. If multiple "Change" tabs exist, one is picked at random.
-                        </p>
-                    </div>
-
-                    {/* Silence Settings */}
-                    <div style={{ padding: '16px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '8px', marginBottom: '16px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={{ fontWeight: 'bold', color: 'white' }}>Silence Settings</span>
-                            <button
-                                className={`bg-toggle-btn ${globalSettings.autoSilence ? 'active' : ''}`}
-                                onClick={() => updateGlobal('autoSilence', !globalSettings.autoSilence)}
-                                style={{ margin: 0 }}
-                            >
-                                {globalSettings.autoSilence ? 'ON' : 'OFF'}
-                            </button>
-                        </div>
-                        <div className="slider-header" style={{ fontSize: '0.85rem', marginTop: '12px' }}>
-                            <span>Silent for how many seconds to switch?</span>
-                            <span>{silenceSeconds}s</span>
-                        </div>
-                        <input
-                            type="range"
-                            min="0"
-                            max="100"
-                            value={globalSettings.silenceThreshold}
-                            onChange={(e) => updateGlobal('silenceThreshold', parseInt(e.target.value, 10))}
-                            className="range-slider"
-                        />
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-                            If ON, when the mic is silent for a certain period, the app automatically switches to a tab with "Silence" in its name.
-                        </p>
-                    </div>
-
-                    {/* Expression Stabilization (Common) */}
-                    <div style={{ padding: '16px', border: '1px solid var(--glass-border)', borderRadius: '8px' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                            <span style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>Expression Stabilization Time</span>
-                            <button
-                                className={`bg-toggle-btn ${globalSettings.enableCooldown !== false ? 'active' : ''}`}
-                                onClick={() => updateGlobal('enableCooldown', globalSettings.enableCooldown === false)}
-                                style={{ margin: 0 }}
-                            >
-                                {globalSettings.enableCooldown !== false ? 'ON' : 'OFF'}
-                            </button>
-                        </div>
-                        <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
-                            Prevents flickering by maintaining an expression for the specified seconds after shifting.
-                        </p>
-                        <div className="slider-header" style={{ fontSize: '0.85rem', marginTop: '12px', opacity: globalSettings.enableCooldown !== false ? 1 : 0.5 }}>
-                            <span>Maintain Time</span>
-                            <span>{globalSettings.switchCooldown?.toFixed(1) || 1.0}s</span>
-                        </div>
-                        <input
-                            type="range"
-                            min="5"
-                            max="30"
-                            value={(globalSettings.switchCooldown || 1.0) * 10}
-                            onChange={(e) => updateGlobal('switchCooldown', parseInt(e.target.value, 10) / 10)}
-                            className="range-slider"
-                            disabled={globalSettings.enableCooldown === false}
-                            style={{ opacity: globalSettings.enableCooldown !== false ? 1 : 0.5 }}
                         />
                     </div>
 
