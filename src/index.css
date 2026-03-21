@@ -204,6 +204,9 @@ body {
   border-radius: 4px;
   width: 100px;
   outline: none;
+  -webkit-app-region: no-drag;
+  -webkit-user-select: text;
+  user-select: text;
 }
 
 .add-tab-btn {

@@ -126,8 +126,9 @@ function App() {
       const data = await loadAppData();
       if (data) {
         if (data.expressions && data.expressions.length > 0) {
-          const merged = data.expressions.map(exp => ({
+          const merged = data.expressions.map((exp, i) => ({
             ...exp,
+            keybind: String(i + 1),
             settings: { ...DEFAULT_EXP_SETTINGS, ...(exp.settings || {}) },
             parts: { ...DEFAULT_PARTS, ...(exp.parts || {}) }
           }));

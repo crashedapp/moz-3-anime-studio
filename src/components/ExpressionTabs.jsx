@@ -23,10 +23,21 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
 
     useEffect(() => {
         if (editingId && inputRef.current) {
-            inputRef.current.focus();
-            inputRef.current.select();
+            // Delay focus to next frame — in production Electron, the OS-level
+            // drag handling from -webkit-app-region:drag can steal focus if we
+            // call .focus() synchronously.
+            requestAnimationFrame(() => {
+                if (inputRef.current) {
+                    inputRef.current.focus();
+                    inputRef.current.select();
+                }
+            });
         }
     }, [editingId]);
+
+    const renumberKeybinds = (tabList) => {
+        return tabList.map((t, i) => ({ ...t, keybind: String(i + 1) }));
+    };
 
     const handleAdd = () => {
         if (tabs.length >= 8) {
@@ -36,7 +47,7 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
 
         const newId = String(Date.now());
         const newIndex = tabs.length + 1;
-        const keybind = newIndex <= 9 ? String(newIndex) : '';
+        const keybind = String(newIndex);
         setTabs([...tabs, {
             id: newId,
             name: 'Double click to edit tab name',
@@ -53,7 +64,7 @@ export default function ExpressionTabs({ tabs, activeId, onSelect, setTabs }) {
             return;
         }
         if (window.confirm("Do you want to delete this tab?")) {
-            const newTabs = tabs.filter(t => t.id !== id);
+            const newTabs = renumberKeybinds(tabs.filter(t => t.id !== id));
             setTabs(newTabs);
             if (activeId === id) {
                 onSelect(newTabs[0].id);

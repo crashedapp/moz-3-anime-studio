@@ -28,6 +28,7 @@ Avatarian Contains the following Changes From the Original.
 - **Defaulted to Mic being active.
 - **Reworked lip-syncing to move mouth more accurately with sound.
 - **The exit stream mode hover button was taking a bit long to disappear so I decreased it to 1 second.
+- **Fixed issue of tabs not getting renumbered when one is deleted.
 
 
 
