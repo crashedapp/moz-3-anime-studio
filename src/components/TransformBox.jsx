@@ -37,7 +37,7 @@ export default function TransformBox({ transform, onChange, isEditMode, setEditM
             <div
                 style={{
                     position: 'absolute',
-                    transform: `scale(${transform.scaleX || 1}, ${transform.scaleY || 1}) rotate(${transform.rotation || 0}deg)`,
+                    transform: `rotate(${transform.rotation || 0}deg)`,
                     transformOrigin: 'center center',
                     width: '100%',
                     height: '100%',

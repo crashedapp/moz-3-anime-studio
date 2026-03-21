@@ -108,6 +108,32 @@ export default function SlotPanel({ parts, onPartChange, tabName, onResetTransfo
                     </div>
                 </div>
 
+                <div style={{ marginBottom: '16px' }}>
+                    <div className="slider-header">
+                        <span>Scale</span>
+                        <span>{Math.round((layoutTransform?.scaleX || 1) * 100)}%</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '8px' }}>
+                        <input
+                            type="range"
+                            min="1"
+                            max="500"
+                            value={Math.round((layoutTransform?.scaleX || 1) * 100)}
+                            onChange={(e) => { const v = parseInt(e.target.value, 10) / 100; onLayoutTransformChange({ ...(layoutTransform || { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 }), scaleX: v, scaleY: v }); }}
+                            className="range-slider"
+                            style={{ flex: 1 }}
+                        />
+                        <input
+                            type="number"
+                            min="1"
+                            max="500"
+                            value={Math.round((layoutTransform?.scaleX || 1) * 100)}
+                            onChange={(e) => { const v = (parseInt(e.target.value, 10) || 100) / 100; onLayoutTransformChange({ ...(layoutTransform || { x: 0, y: 0, scaleX: 1, scaleY: 1, rotation: 0 }), scaleX: v, scaleY: v }); }}
+                            style={{ width: '60px', padding: '4px 6px', background: 'rgba(255,255,255,0.1)', color: 'var(--text-primary)', border: '1px solid var(--glass-border)', borderRadius: '4px', fontFamily: 'monospace', fontSize: '0.85rem', textAlign: 'center' }}
+                        />
+                    </div>
+                </div>
+
                 <button
                     className="bg-toggle-btn"
                     style={{ width: '100%', padding: '12px' }}

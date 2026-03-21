@@ -132,7 +132,8 @@ export default function Preview({ globalSettings, activeTabId, parts, transform,
                                         position: 'absolute',
                                         width: '100%',
                                         height: '100%',
-                                        transform: `translate(${mx}px, ${my}px)`
+                                        transform: `translate(${mx}px, ${my}px) scale(${gTransform?.scaleX || 1})`,
+                                        transformOrigin: 'center bottom'
                                     }}>
                                         <div
                                             className="preview-canvas"
@@ -167,6 +168,8 @@ export default function Preview({ globalSettings, activeTabId, parts, transform,
                             position: 'absolute',
                             right: `${gTransform?.x || 0}px`,
                             top: `${gTransform?.y || 0}px`,
+                            transform: `scale(${gTransform?.scaleX || 1})`,
+                            transformOrigin: 'top right'
                         }}>
                             <div
                                 className="preview-canvas"
