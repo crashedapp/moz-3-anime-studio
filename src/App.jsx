@@ -46,6 +46,17 @@ const handleWindowControl = (command) => {
   }
 };
 
+const handleResizeStart = (direction) => {
+  if (!window.require) return;
+  const { ipcRenderer } = window.require('electron');
+  ipcRenderer.send('start-resize', direction);
+  const onMouseUp = () => {
+    ipcRenderer.send('stop-resize');
+    window.removeEventListener('mouseup', onMouseUp);
+  };
+  window.addEventListener('mouseup', onMouseUp);
+};
+
 const handleHeaderMouseDown = (e) => {
   // Only handle left-click drag, and not on interactive elements
   if (e.button !== 0) return;
@@ -405,6 +416,20 @@ function App() {
         isOpen={isAboutModalOpen}
         onClose={() => setIsAboutModalOpen(false)}
       />
+
+      {/* Window resize edges for frameless transparent window */}
+      {!isStreamMode && (
+        <>
+          <div className="resize-edge resize-top" onMouseDown={() => handleResizeStart('top')} />
+          <div className="resize-edge resize-bottom" onMouseDown={() => handleResizeStart('bottom')} />
+          <div className="resize-edge resize-left" onMouseDown={() => handleResizeStart('left')} />
+          <div className="resize-edge resize-right" onMouseDown={() => handleResizeStart('right')} />
+          <div className="resize-edge resize-top-left" onMouseDown={() => handleResizeStart('top-left')} />
+          <div className="resize-edge resize-top-right" onMouseDown={() => handleResizeStart('top-right')} />
+          <div className="resize-edge resize-bottom-left" onMouseDown={() => handleResizeStart('bottom-left')} />
+          <div className="resize-edge resize-bottom-right" onMouseDown={() => handleResizeStart('bottom-right')} />
+        </>
+      )}
     </div>
   );
 }

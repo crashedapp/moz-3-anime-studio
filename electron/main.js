@@ -1,5 +1,5 @@
 import electron from 'electron';
-const { app, BrowserWindow, ipcMain, systemPreferences } = electron;
+const { app, BrowserWindow, ipcMain, systemPreferences, screen } = electron;
 import path from 'path';
 
 
@@ -11,8 +11,11 @@ function createWindow() {
         title: 'MOZ-3 Anime Studio',
         width: 1200,
         height: 800,
+        minWidth: 800,
+        minHeight: 600,
         transparent: true,
         frame: false,
+        thickFrame: true,
         backgroundColor: '#00000000',
         webPreferences: {
             nodeIntegration: true,
@@ -66,6 +69,55 @@ app.whenReady().then(async () => {
         const win = BrowserWindow.fromWebContents(event.sender);
         if (win && dragStartWinPos) {
             win.setPosition(dragStartWinPos[0] + deltaX, dragStartWinPos[1] + deltaY);
+        }
+    });
+
+    // Custom resize for transparent frameless windows
+    let resizeDir = null;
+    let resizeStartBounds = null;
+    let resizeStartCursor = null;
+    let resizeInterval = null;
+
+    ipcMain.on('start-resize', (event, direction) => {
+        const win = BrowserWindow.fromWebContents(event.sender);
+        if (!win) return;
+        resizeDir = direction;
+        resizeStartBounds = win.getBounds();
+        resizeStartCursor = screen.getCursorScreenPoint();
+
+        if (resizeInterval) clearInterval(resizeInterval);
+        resizeInterval = setInterval(() => {
+            if (!resizeDir || !win || win.isDestroyed()) {
+                clearInterval(resizeInterval);
+                return;
+            }
+            const cursor = screen.getCursorScreenPoint();
+            const dx = cursor.x - resizeStartCursor.x;
+            const dy = cursor.y - resizeStartCursor.y;
+            const b = { ...resizeStartBounds };
+            const minW = 800, minH = 600;
+
+            if (resizeDir.includes('right')) b.width = Math.max(minW, resizeStartBounds.width + dx);
+            if (resizeDir.includes('bottom')) b.height = Math.max(minH, resizeStartBounds.height + dy);
+            if (resizeDir.includes('left')) {
+                const newW = Math.max(minW, resizeStartBounds.width - dx);
+                b.x = resizeStartBounds.x + (resizeStartBounds.width - newW);
+                b.width = newW;
+            }
+            if (resizeDir.includes('top')) {
+                const newH = Math.max(minH, resizeStartBounds.height - dy);
+                b.y = resizeStartBounds.y + (resizeStartBounds.height - newH);
+                b.height = newH;
+            }
+            win.setBounds(b);
+        }, 16);
+    });
+
+    ipcMain.on('stop-resize', () => {
+        resizeDir = null;
+        if (resizeInterval) {
+            clearInterval(resizeInterval);
+            resizeInterval = null;
         }
     });
 

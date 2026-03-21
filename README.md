@@ -11,7 +11,8 @@ This Fork Contains the following Changes.
 - **There is no more auto-switching between tabs by the app as I found that not suitable for my purposes.
 - **Background Music Feature has been removed.
 - **Added the ability to place the character in a circular border with and optional background image.
-- **Fixed Dragging of Window when not maximized on Windows.
+- **Fixed Dragging of Window when not maximized on Windows. You can move by title bar though can be a bit finicky (Due to transparent window support)
+- **Fixed cannot resized non maximized window. Not normal resize but it works if you do it from the bootom or right edge (Due to transparent window support)
 - **Added ability to scale model image (including eyes).
 - **Removed support for dragging character in editor. Added x,y positional sliders instead as drag and drop was flakey.
 - **Redid positioning system to offest characters from the right panel so they maintain position when window is resized.
