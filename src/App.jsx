@@ -145,6 +145,36 @@ function App() {
     initData();
   }, []);
 
+  // Stream Deck IPC: listen for tab switch and tab list requests
+  useEffect(() => {
+    if (!window.require) return;
+    const { ipcRenderer } = window.require('electron');
+
+    const handleSwitchTab = (_event, { keybind }) => {
+      setExpressions(prev => {
+        const matched = prev.find(t => t.keybind === keybind);
+        if (matched) setActiveTabId(matched.id);
+        return prev;
+      });
+    };
+
+    const handleGetTabs = () => {
+      setExpressions(prev => {
+        const { ipcRenderer: ipc } = window.require('electron');
+        ipc.send('get-tabs-reply', prev.map(t => ({ id: t.id, name: t.name, keybind: t.keybind })));
+        return prev;
+      });
+    };
+
+    ipcRenderer.on('switch-tab', handleSwitchTab);
+    ipcRenderer.on('get-tabs', handleGetTabs);
+
+    return () => {
+      ipcRenderer.removeListener('switch-tab', handleSwitchTab);
+      ipcRenderer.removeListener('get-tabs', handleGetTabs);
+    };
+  }, []);
+
   useEffect(() => {
     // Handle Escape key to exit stream mode
     const handleKeyDown = (e) => {

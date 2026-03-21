@@ -92,6 +92,61 @@ npm run build
    - In the Settings Panel, find the **Background Color** section.
    - Select Green, Blue, or Magenta to use chroma key filters in your streaming software (like OBS Studio). Choose Transparent if your capture setup supports an alpha channel directly.
 
+## Stream Deck Integration
+
+Avatarian includes a built-in HTTP API server that allows you to switch expression tabs remotely — perfect for use with an Elgato Stream Deck or any device/tool that can send HTTP requests.
+
+When the app starts, a local API server automatically launches on **port 8769**, bound to `127.0.0.1` (localhost only) for security.
+
+### Endpoints
+
+| Endpoint | Method | Purpose |
+|---|---|---|
+| `http://127.0.0.1:8769/api/switch/1` | GET | Switch to the tab with keybind **1** |
+| `http://127.0.0.1:8769/api/switch/2` | GET | Switch to the tab with keybind **2** |
+| `http://127.0.0.1:8769/api/switch/3` | GET | Switch to the tab with keybind **3** |
+| ... up to `/api/switch/8` | GET | Supports keybinds **1** through **8** |
+| `http://127.0.0.1:8769/api/tabs` | GET | Returns a JSON list of all tabs (id, name, keybind) |
+
+### Example Response — `/api/tabs`
+```json
+{
+  "tabs": [
+    { "id": "1", "name": "Talk (Demo)", "keybind": "1" },
+    { "id": "2", "name": "Laugh (Demo)", "keybind": "2" },
+    { "id": "3", "name": "Sleep (Demo)", "keybind": "3" }
+  ]
+}
+```
+
+### Example Response — `/api/switch/2`
+```json
+{ "ok": true, "switched": "2" }
+```
+
+### Setting Up Your Stream Deck
+
+1. **Using the "Website" action:** Add a "Website" action to a button and set the URL to `http://127.0.0.1:8769/api/switch/1` (change the number for each expression). Uncheck "Access in default browser" if that option is available.
+2. **Using the "API Ninja" plugin (recommended):** Install the API Ninja plugin from the Stream Deck Store, add an "API Request" action, set the method to **GET**, and enter the URL for each button.
+3. **Any HTTP tool:** Any tool that can make a GET request to a URL will work (curl, Postman, AutoHotkey, Touch Portal, etc.).
+
+### Changing the Port
+
+The API server port is defined as `STREAM_DECK_PORT` at the top of `electron/main.js`. To change it:
+
+1. Open `electron/main.js`
+2. Find the line:
+   ```js
+   const STREAM_DECK_PORT = 8769;
+   ```
+3. Change `8769` to your desired port number
+4. Restart the app
+5. Update your Stream Deck button URLs to use the new port
+
+### Security
+
+The API server **only accepts connections from localhost** (`127.0.0.1`). Remote connections are rejected with a `403 Forbidden` response. This means only software running on the same machine as Avatarian can control it.
+
 
 ## License
 Same license as original code.
